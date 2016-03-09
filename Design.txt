@@ -1,0 +1,122 @@
+===========================
+Open Chemical Graph Library
+===========================
+
+* C++11
+* standalone
+* header-only
+* namespace: ocgl
+* style: lowercase using '_' (STL like)
+
+
+Goals
+=====
+
+* Reusable (i.e. allow external graphs to be used: OpenBabel, Avogadro, RDKit, ...)
+* Complete and incremental algorithms (e.g. fast cycle perception while editing a graph)
+
+Algorithms
+==========
+
+* Traversal
+  * Depth First Search
+  * Breadth First Search
+  * Backtrack (i.e. exhaustive DFS with possible pruning)
+* Shortest Path
+  * Dijkstra
+  * Floyd-Warshall
+* Connected Components
+  * Incremental version
+* Cycle Membership
+  * Incremental version
+* Cycles
+  * Relevant Cycles (i.e. union of all SSSR)
+  * Incremental version
+* (Sub)graph Isomorphism
+  * VF2
+  * Ullman??
+* Morgan's Extended Connectivities
+* Canonicalization / Automorphisms
+  * Schreier-Sims to store automorphisms
+* Maximum Matching
+  * used for "kekulization"
+* Maximum Common Edge Subgraph
+  * RASCAL: Calculation of Graph Similarity using Maximum Common Edge Subgraphs
+
+
+Data Structures
+===============
+
+* distance_matrix
+* path_included_distance_matrix
+* iter_pair
+
+
+Graph Concept
+=============
+
+* undirected
+* no parallel edges
+* no loop edges
+* vertices and edges are indexed from 0
+
+
+Associated Types and Functions
+--------------------------
+
+* ocgl::graph_traits<Graph>::
+  * vertex: Vertex type (e.g. integer index, pointer, (small) object, ...)
+  * edge: Edge type
+  * vertex_iter: Iterator over vertices in a graph
+  * edge_iter: Iterator over edges in a graph
+  * incident_iter: Iterator over a vertex' incident edges
+  * adjacent_iter: Iterator over a vertex' adjacent vertices
+  * null_vertex(): Returns a null vertex (e.g. -1 for integer index, nullptr for pointer, equality comparable object, ...)
+  * null_edge(): Returns a null edge
+
+notes:
+* when vertex and edge are the same type (e.g. integer index), null_vertex() and null_edge must return the same value
+
+g: graph
+i: integer index
+v, w: vertex
+e: edge
+
+
+Graph Functions
+---------------
+
+* Integer num_vertices(g)
+* Integer num_edges(g)
+* iter_pair<vertex_iter> get_vertices(g)
+* iter_pair<edge_iter> get_edges(g)
+* vertex get_vertex(g, i)
+* edge get_edge(g, i)
+* edge get_edge(g, v, w)
+
+Vertex Functions
+----------------
+
+* Integer get_index(g, v)
+* Integer get_degree(g, v)
+* iter_pair<incident_iter> get_incident(g, v)
+* iter_pair<adjacent_iter> get_adjacent(g, v)
+
+Edge Functions
+--------------
+
+* Integer get_index(g, e)
+* vertex get_source(g, e)
+* vertex get_target(g, e)
+* vertex get_other(g, e)
+
+
+
+Editable Graph Concept
+======================
+
+* clear(g)
+* add_vertex(g)
+* remove_vertex(g, v)
+* add_edge(g, v, w)
+* remove_edge(g, e)
