@@ -108,6 +108,28 @@ namespace ocgl {
     return !is_null(g, x);
   }
 
+  /**
+   * @brief Check if two vertices are connected by an edge.
+   *
+   * This is a wrapper around get_edge(g, v, w) that compares the return value
+   * with the null edge.
+   *
+   * @param g The graph.
+   * @param v One of the vertices.
+   * @param w One of the vertices.
+   *
+   * @pre is_valid(g, v)
+   * @pre is_valid(g, w)
+   *
+   * @return is_valid(get_edge(g, v, w))
+   */
+  template<typename Graph>
+  bool is_connected(const Graph &g, typename graph_traits<Graph>::vertex v,
+      typename graph_traits<Graph>::vertex w)
+  {
+    return is_valid(get_edge(g, v, w));
+  }
+
 } // namespace ocgl
 
 #endif // OCGL_GRAPH_TRAITS_H
