@@ -21,8 +21,10 @@ foreach(WARNING_NAME ${IGNORE_WARNINGS})
   set(IGNORE_WARNINGS_FLAGS "${IRGNORE_WARNINGS_FLAGS} -Wno-${WARNING_NAME}")
 endforeach()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "-pedantic -Wall ${IGNORE_WARNINGS_FLAGS}")
+
+find_package(Threads)
 
 ############################################################
 #
