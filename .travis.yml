@@ -9,7 +9,7 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install cmake
+  - sudo apt-get install cmake cmake-data
 
 before_script:
   - mkdir build
