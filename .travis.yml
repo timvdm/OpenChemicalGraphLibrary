@@ -1,7 +1,6 @@
 language: cpp
 
 compiler:
-  - gcc
   - clang
 
 before_install:
@@ -12,7 +11,7 @@ install:
   - sudo apt-get install cmake cmake-data libgtest-dev
   - mkdir gtest_build
   - cd gtest_build
-  - cmake -DCMAKE_BUILD_TYPE=Release /usr/src/gtest
+  - cmake /usr/src/gtest
   - make
   - sudo mv libg* /usr/lib
   - cd -
