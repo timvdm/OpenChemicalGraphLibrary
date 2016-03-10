@@ -10,6 +10,7 @@ before_install:
 
 install:
   - sudo apt-get install cmake cmake-data libgtest-dev
+  - "cd /usr/src/gtest && sudo cmake . && sudo cmake --build . && sudo mv libg* /usr/local/lib/ ; cd -"
 
 before_script:
   - mkdir build
