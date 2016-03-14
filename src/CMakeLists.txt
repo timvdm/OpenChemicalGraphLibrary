@@ -1,5 +1,9 @@
 set(OCGL_HDRS
-  graph_traits.h
+  #IterPair.h
+  GraphTraits.h
+  #PropertyMap.h
+
+  #model/PointerGraph.h
 )
 
 copy_headers("${OCGL_HDRS}" ocgl)

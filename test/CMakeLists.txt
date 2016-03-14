@@ -1,1 +1,4 @@
-add_gtest(graph_traits.cpp)
+add_gtest(GraphTraits.cpp)
+#add_gtest(PropertyMap.cpp)
+
+#add_subdirectory(model)
