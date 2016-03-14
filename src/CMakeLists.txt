@@ -1,5 +1,5 @@
 set(OCGL_HDRS
-  #IterPair.h
+  IterPair.h
   GraphTraits.h
   #PropertyMap.h
 
