@@ -1,13 +1,13 @@
-#ifndef OCGL_ITER_PAIR_H
-#define OCGL_ITER_PAIR_H
+#ifndef OCGL_RANGE_H
+#define OCGL_RANGE_H
 
 namespace ocgl {
 
   /**
-   * @brief Iterator pair (i.e. range).
+   * @brief Iterator range.
    */
   template<typename Iterator>
-  class IterPair
+  class Range
   {
     public:
       /**
@@ -16,7 +16,7 @@ namespace ocgl {
        * @param begin The begin iterator.
        * @param end The end iterator.
        */
-      IterPair(Iterator begin, Iterator end)
+      Range(Iterator begin, Iterator end)
         : m_begin(begin), m_end(end)
       {
       }
@@ -59,16 +59,16 @@ namespace ocgl {
   };
 
   /**
-   * @brief Helper function to create iterator pair.
+   * @brief Helper function to create iterator range.
    *
    * @param begin The begin iterator.
    * @param end The end iterator.
    */
   template<typename Iterator>
-  IterPair<Iterator> makeIterPair(const Iterator &begin,
+  Range<Iterator> makeRange(const Iterator &begin,
       const Iterator &end)
   {
-    return IterPair<Iterator>(begin, end);
+    return Range<Iterator>(begin, end);
   }
 
 } // namespace ocgl

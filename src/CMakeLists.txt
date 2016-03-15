@@ -1,6 +1,6 @@
 set(OCGL_HDRS
   Contract.h
-  IterPair.h
+  Range.h
   GraphTraits.h
   #AdjacentIterator.h
   #PropertyMap.h

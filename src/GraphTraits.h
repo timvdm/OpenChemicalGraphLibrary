@@ -2,7 +2,7 @@
 #define OCGL_GRAPH_TRAITS_H
 
 #include <ocgl/Contract.h>
-#include <ocgl/IterPair.h>
+#include <ocgl/Range.h>
 
 #include <type_traits>
 
@@ -212,7 +212,7 @@ namespace ocgl {
    * @param g The graph.
    */
   template<typename Graph>
-  IterPair<typename GraphTraits<Graph>::VertexIter> getVertices(const Graph &g)
+  Range<typename GraphTraits<Graph>::VertexIter> getVertices(const Graph &g)
   {
     return get_vertices(g);
   }
@@ -226,7 +226,7 @@ namespace ocgl {
    * @param g The graph.
    */
   template<typename Graph>
-  IterPair<typename GraphTraits<Graph>::EdgeIter> getEdges(const Graph &g)
+  Range<typename GraphTraits<Graph>::EdgeIter> getEdges(const Graph &g)
   {
     return get_edges(g);
   }
@@ -322,7 +322,7 @@ namespace ocgl {
    * @pre isValid(g, v)
    */
   template<typename Graph>
-  IterPair<typename GraphTraits<Graph>::IncidentIter> getIncident(const Graph &g,
+  Range<typename GraphTraits<Graph>::IncidentIter> getIncident(const Graph &g,
       typename GraphTraits<Graph>::Vertex v)
   {
     PRE(isValid(g, v));
@@ -342,7 +342,7 @@ namespace ocgl {
    * @pre isValid(g, v)
    */
   template<typename Graph>
-  IterPair<typename GraphTraits<Graph>::AdjacentIter> getAdjacent(const Graph &g,
+  Range<typename GraphTraits<Graph>::AdjacentIter> getAdjacent(const Graph &g,
       typename GraphTraits<Graph>::Vertex v)
   {
     PRE(isValid(g, v));
