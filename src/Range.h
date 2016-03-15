@@ -1,6 +1,11 @@
 #ifndef OCGL_RANGE_H
 #define OCGL_RANGE_H
 
+/**
+ * @file Range.h
+ * @brief Iterator range.
+ */
+
 namespace ocgl {
 
   /**
