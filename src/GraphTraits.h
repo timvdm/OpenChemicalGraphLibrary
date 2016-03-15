@@ -1,6 +1,7 @@
 #ifndef OCGL_GRAPH_TRAITS_H
 #define OCGL_GRAPH_TRAITS_H
 
+#include <ocgl/Contract.h>
 #include <ocgl/IterPair.h>
 
 #include <type_traits>
@@ -10,9 +11,13 @@
  * @brief Graph concept type traits and functions.
  */
 
+/**
+ * @namespace ocgl
+ * @brief Namespace ocgl
+ */
 namespace ocgl {
 
-  /**
+  /*
    * @page graph_concept_page Graph Concept
    *
    * num_vertices(g)
@@ -104,23 +109,27 @@ namespace ocgl {
     }
   };
 
-  struct VertexTag {};
-  struct EdgeTag {};
+  namespace impl {
 
-  template<typename Graph, typename Tag>
-  struct Tag2Type;
+    struct VertexTag {};
+    struct EdgeTag {};
 
-  template<typename Graph>
-  struct Tag2Type<Graph, VertexTag>
-  {
-    using Type = typename GraphTraits<Graph>::Vertex;
-  };
+    template<typename Graph, typename Tag>
+    struct Tag2Type;
 
-  template<typename Graph>
-  struct Tag2Type<Graph, EdgeTag>
-  {
-    using Type = typename GraphTraits<Graph>::Edge;
-  };
+    template<typename Graph>
+    struct Tag2Type<Graph, VertexTag>
+    {
+      using Type = typename GraphTraits<Graph>::Vertex;
+    };
+
+    template<typename Graph>
+    struct Tag2Type<Graph, EdgeTag>
+    {
+      using Type = typename GraphTraits<Graph>::Edge;
+    };
+
+  } // namespace impl
 
   //////////////////////////////////////////////////////////////////////////////
   //
@@ -236,6 +245,8 @@ namespace ocgl {
   template<typename Graph>
   typename GraphTraits<Graph>::Vertex getVertex(const Graph &g, unsigned int id)
   {
+    PRE_LT(id, numVertexIds(g));
+
     return get_vertex(g, id);
   }
 
@@ -253,8 +264,13 @@ namespace ocgl {
   template<typename Graph>
   typename GraphTraits<Graph>::Edge getEdge(const Graph &g, unsigned int id)
   {
+    PRE_LT(id, numEdgeIds(g));
+
     return get_edge(g, id);
   }
+
+  template<typename Graph, typename VertexOrEdge>
+  bool isValid(const Graph &g, VertexOrEdge x);
 
   /**
    * @brief Get the vertex or edge id.
@@ -270,6 +286,8 @@ namespace ocgl {
   template<typename Graph, typename VertexOrEdge>
   unsigned int getId(const Graph &g, VertexOrEdge x)
   {
+    PRE(isValid(g, x));
+
     return get_id(g, x);
   }
 
@@ -287,6 +305,8 @@ namespace ocgl {
   template<typename Graph>
   unsigned int getDegree(const Graph &g, typename GraphTraits<Graph>::Vertex v)
   {
+    PRE(isValid(g, v));
+
     return get_degree(g, v);
   }
 
@@ -305,6 +325,8 @@ namespace ocgl {
   IterPair<typename GraphTraits<Graph>::IncidentIter> getIncident(const Graph &g,
       typename GraphTraits<Graph>::Vertex v)
   {
+    PRE(isValid(g, v));
+
     return get_incident(g, v);
   }
 
@@ -323,6 +345,8 @@ namespace ocgl {
   IterPair<typename GraphTraits<Graph>::AdjacentIter> getAdjacent(const Graph &g,
       typename GraphTraits<Graph>::Vertex v)
   {
+    PRE(isValid(g, v));
+
     return get_adjacent(g, v);
   }
 
@@ -341,6 +365,8 @@ namespace ocgl {
   typename GraphTraits<Graph>::Vertex getSource(const Graph &g,
       typename GraphTraits<Graph>::Edge e)
   {
+    PRE(isValid(g, e));
+
     return get_source(g, e);
   }
 
@@ -359,10 +385,12 @@ namespace ocgl {
   typename GraphTraits<Graph>::Vertex getTarget(const Graph &g,
       typename GraphTraits<Graph>::Edge e)
   {
+    PRE(isValid(g, e));
+
     return get_target(g, e);
   }
 
-  /*
+  /**
    * @brief Add a vertex to the graph.
    *
    * This is a wrapper function around the add_vertex(g) function that needs
@@ -378,7 +406,7 @@ namespace ocgl {
     return add_vertex(g);
   }
 
-  /*
+  /**
    * @brief Remove a vertex from the graph.
    *
    * This is a wrapper function around the remove_vertex(g, v) function that
@@ -390,10 +418,16 @@ namespace ocgl {
   template<typename Graph>
   void removeVertex(Graph &g, typename GraphTraits<Graph>::Vertex v)
   {
+    PRE(isValid(g, v));
+
     return remove_vertex(g, v);
   }
 
-  /*
+  template<typename Graph>
+  bool isConnected(const Graph &g, typename GraphTraits<Graph>::Vertex v,
+      typename GraphTraits<Graph>::Vertex w);
+
+  /**
    * @brief Add an edge to the graph.
    *
    * This is a wrapper function around the add_edge(g, v, w) function that needs
@@ -403,6 +437,11 @@ namespace ocgl {
    * @param v The source vertex.
    * @param w The target vertex.
    *
+   * @pre isValid(g, v)
+   * @pre isValid(g, w)
+   * @pre v != w
+   * @pre !isConnected(g, v, w)
+   *
    * @return The new edge.
    */
   template<typename Graph>
@@ -410,10 +449,15 @@ namespace ocgl {
       typename GraphTraits<Graph>::Vertex v,
       typename GraphTraits<Graph>::Vertex w)
   {
+    PRE(isValid(g, v));
+    PRE(isValid(g, w));
+    PRE_NE(v, w);
+    PRE_FALSE(isConnected(g, v, w));
+
     return add_edge(g, v, w);
   }
 
-  /*
+  /**
    * @brief Remove an edge from the graph.
    *
    * This is a wrapper function around the remove_edge(g, e) function that
@@ -421,10 +465,14 @@ namespace ocgl {
    *
    * @param g The graph.
    * @param e The edge.
+   *
+   * @pre isValid(g, e)
    */
   template<typename Graph>
   void removeEdge(Graph &g, typename GraphTraits<Graph>::Edge e)
   {
+    PRE(isValid(g, e));
+
     return remove_edge(g, e);
   }
 
@@ -437,10 +485,8 @@ namespace ocgl {
   template<typename Graph>
   void clearGraph(Graph &g)
   {
-    g.clear();
+    clear_graph(g);
   }
-
-
 
   //////////////////////////////////////////////////////////////////////////////
   //
@@ -448,6 +494,21 @@ namespace ocgl {
   //
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @brief Get a null vertex.
+   *
+   * This is a helper function to shorten
+   *
+   * @code
+   * GraphTraits<Graph>::template null<typename GraphTraits<Graph>::Vertex>()
+   * @endcode
+   *
+   * to
+   *
+   * @code
+   * nullVertex<Graph>()
+   * @endcode
+   */
   template<typename Graph>
   typename GraphTraits<Graph>::Vertex nullVertex()
   {
@@ -455,6 +516,21 @@ namespace ocgl {
     return GraphTraits<Graph>::template null<Vertex>();
   }
 
+  /**
+   * @brief Get a null edge.
+   *
+   * This is a helper function to shorten
+   *
+   * @code
+   * GraphTraits<Graph>::template null<typename GraphTraits<Graph>::Edge>()
+   * @endcode
+   *
+   * to
+   *
+   * @code
+   * nullEdge<Graph>()
+   * @endcode
+   */
   template<typename Graph>
   typename GraphTraits<Graph>::Edge nullEdge()
   {
@@ -552,7 +628,7 @@ namespace ocgl {
   bool isConnected(const Graph &g, typename GraphTraits<Graph>::Vertex v,
       typename GraphTraits<Graph>::Vertex w)
   {
-    return isValid(getEdge(g, v, w));
+    return isValid(g, getEdge(g, v, w));
   }
 
 } // namespace ocgl

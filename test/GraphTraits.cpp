@@ -179,9 +179,9 @@ TYPED_TEST(Tag2TypeTest, Main)
   using Edge = typename ocgl::GraphTraits<Graph>::Edge;
 
   // VertexTag -> typename GraphTraits<Graph>::Vertex
-  static_assert(std::is_same<Vertex, typename ocgl::Tag2Type<Graph, ocgl::VertexTag>::Type>::value, "");
+  static_assert(std::is_same<Vertex, typename ocgl::impl::Tag2Type<Graph, ocgl::impl::VertexTag>::Type>::value, "");
   // EdgeTag -> typename GraphTraits<Graph>::Edge
-  static_assert(std::is_same<Edge, typename ocgl::Tag2Type<Graph, ocgl::EdgeTag>::Type>::value, "");
+  static_assert(std::is_same<Edge, typename ocgl::impl::Tag2Type<Graph, ocgl::impl::EdgeTag>::Type>::value, "");
 }
 
 int main(int argc, char **argv)
