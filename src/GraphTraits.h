@@ -577,8 +577,13 @@ namespace ocgl {
   typename GraphTraits<Graph>::Vertex getOther(const Graph &g,
       typename GraphTraits<Graph>::Edge e, typename GraphTraits<Graph>::Vertex v)
   {
+    PRE(isValid(g, e));
+    PRE(isValid(g, v));
+
     auto s = getSource(g, e);
     auto t = getTarget(g, e);
+
+    PRE(v == s || v == t);
 
     return v == t ? s : t;
   }
@@ -598,6 +603,9 @@ namespace ocgl {
       typename GraphTraits<Graph>::Vertex v,
       typename GraphTraits<Graph>::Vertex w)
   {
+    PRE(isValid(g, v));
+    PRE(isValid(g, w));
+
     for (auto e : getIncident(g, v)) {
       auto s = getSource(g, e);
       auto t = getTarget(g, e);
@@ -628,6 +636,9 @@ namespace ocgl {
   bool isConnected(const Graph &g, typename GraphTraits<Graph>::Vertex v,
       typename GraphTraits<Graph>::Vertex w)
   {
+    PRE(isValid(g, v));
+    PRE(isValid(g, w));
+
     return isValid(g, getEdge(g, v, w));
   }
 
