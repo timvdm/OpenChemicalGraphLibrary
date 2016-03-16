@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <limits>
+#include <algorithm>
 
 namespace ocgl {
 
