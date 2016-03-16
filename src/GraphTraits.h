@@ -17,8 +17,9 @@
  */
 namespace ocgl {
 
-  /*
+  /**
    * @page graph_concept_page Graph Concept
+   * @brief Graph Concept documentation.
    *
    * num_vertices(g)
    * num_edges(g)
@@ -62,6 +63,7 @@ namespace ocgl {
    */
 
   /**
+   * @class GraphTraits GraphTraits.h <ocgl/GraphTraits.h>
    * @brief Graph concept type traits.
    *
    * The GraphTraits class is used to determine the associated types for a
