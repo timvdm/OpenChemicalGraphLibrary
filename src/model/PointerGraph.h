@@ -6,6 +6,8 @@
 #include <ocgl/AdjacentIterator.h>
 
 #include <vector>
+#include <memory>
+#include <algorithm>
 
 namespace ocgl {
 
