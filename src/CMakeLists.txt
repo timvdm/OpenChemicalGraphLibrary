@@ -4,6 +4,7 @@ set(OCGL_HDRS
   GraphTraits.h
   AdjacentIterator.h
   PropertyMap.h
+  GraphStringParser.h
 
   model/PointerGraph.h
   model/IdGraph.h

@@ -1,6 +1,9 @@
 #ifndef OCGL_RANGE_H
 #define OCGL_RANGE_H
 
+#include <iterator>
+#include <vector>
+
 /**
  * @file Range.h
  * @brief Iterator range.
@@ -56,6 +59,14 @@ namespace ocgl {
       Iterator& end()
       {
         return m_end;
+      }
+
+      /**
+       * @brief Construct a std::vector from the range.
+       */
+      std::vector<typename std::iterator_traits<Iterator>::value_type> toVector() const
+      {
+        return std::vector<typename std::iterator_traits<Iterator>::value_type>(m_begin, m_end);
       }
 
     private:
