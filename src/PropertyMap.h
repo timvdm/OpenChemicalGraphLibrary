@@ -36,6 +36,14 @@ namespace ocgl {
       using ConstReference = typename std::vector<T>::const_reference;
 
       /**
+       * @brief Get the graph.
+       */
+      const Graph& graph() const
+      {
+        return m_graph;
+      }
+
+      /**
        * @brief Constructor.
        *
        * @param graph The graph.
@@ -109,6 +117,41 @@ namespace ocgl {
    */
   template<typename Graph, typename T>
   using EdgePropertyMap = PropertyMap<Graph, T, impl::EdgeTag>;
+
+  /**
+   * @class VertexEdgePropertyMap PropertyMap.h <ocgl/PropertyMap.h>
+   * @brief Wrapper for combined vertex/edge property map.
+   */
+  template<typename Graph, typename T>
+  struct VertexEdgePropertyMap
+  {
+    public:
+      /**
+       * @brief Constructor.
+       *
+       * @param g The graph.
+       */
+      VertexEdgePropertyMap(const Graph &g) : vertices(g), edges(g)
+      {
+      }
+
+      /**
+       * @brief Get the graph.
+       */
+      const Graph& graph() const
+      {
+        return vertices.graph();
+      }
+
+      /**
+       * @brief The vertex property map.
+       */
+      VertexPropertyMap<Graph, T> vertices;
+      /**
+       * @brief The edge property map.
+       */
+      EdgePropertyMap<Graph, T> edges;
+  };
 
 } // namespace ocgl
 

@@ -47,7 +47,7 @@ namespace ocgl {
        * @param g The graph.
        * @param i The component (i.e. [0,n])
        */
-      void component(const Graph &g, int i) {}
+      void component(const Graph &g, unsigned int i) {}
 
       /**
        * @brief Visit a vertex.
@@ -106,39 +106,38 @@ namespace ocgl {
        */
       template<typename Graph, typename DFSVisitor>
       void dfs(const Graph &g, typename GraphTraits<Graph>::Vertex v,
-          DFSVisitor &visitor, VertexPropertyMap<Graph, bool> &visitedVertices,
-          EdgePropertyMap<Graph, bool> &visitedEdges)
+          DFSVisitor &visitor, VertexEdgePropertyMap<Graph, bool> &visited)
       {
         // mark vertex as visited
-        visitedVertices[v] = true;
+        visited.vertices[v] = true;
         // invoke vertex visitor
         visitor.vertex(g, v);
 
         // call impl::dfs for all unvisited neighbors of v
         for (auto e : getIncident(g, v)) {
           // skip already visited edges
-          if (visitedEdges[e])
+          if (visited.edges[e])
             continue;
 
           auto w = getOther(g, e, v);
 
-          if (visitedVertices[w]) {
+          if (visited.vertices[w]) {
             // if this edge has not been visited before, a back edge has been found
-            if (!visitedEdges[e]) {
+            if (!visited.edges[e]) {
               // invoke back edge visitor
               visitor.backEdge(g, e);
               // mark edge as visited
-              visitedEdges[e] = true;
+              visited.edges[e] = true;
             }
             continue;
           }
 
           // mark edge as visited
-          visitedEdges[e] = true;
+          visited.edges[e] = true;
           // invoke edge visitor
           visitor.edge(g, e);
 
-          dfs(g, w, visitor, visitedVertices, visitedEdges);
+          dfs(g, w, visitor, visited);
 
           // invoke finish edge visitor
           visitor.finishEdge(g, e);
@@ -164,6 +163,9 @@ namespace ocgl {
      *
      * @param g The graph.
      * @param visitor The DFS visitor.
+     *
+     * Example:
+     * @include algorithm/DFS.cpp
      */
     template<typename Graph, typename DFSVisitor>
     void dfs(const Graph &g, DFSVisitor &visitor)
@@ -171,16 +173,15 @@ namespace ocgl {
       visitor.initialize(g);
 
       // keep track of visited vertices and edges using property maps
-      VertexPropertyMap<Graph, bool> visitedVertices(g);
-      EdgePropertyMap<Graph, bool> visitedEdges(g);
+      VertexEdgePropertyMap<Graph, bool> visited(g);
 
-      int c = 0;
+      unsigned int c = 0;
       for (auto v : getVertices(g)) {
-        if (!visitedVertices[v]) {
+        if (!visited.vertices[v]) {
           // invoke component visitor
           visitor.component(g, c++);
           // initiate DFS for component
-          impl::dfs(g, v, visitor, visitedVertices, visitedEdges);
+          impl::dfs(g, v, visitor, visited);
         }
       }
     }
@@ -208,11 +209,10 @@ namespace ocgl {
       visitor.initialize(g);
 
       // keep track of visited vertices and edges using property maps
-      VertexPropertyMap<Graph, bool> visitedVertices(g);
-      EdgePropertyMap<Graph, bool> visitedEdges(g);
+      VertexEdgePropertyMap<Graph, bool> visited(g);
 
       // initiate DFS for component
-      impl::dfs(g, v, visitor, visitedVertices, visitedEdges);
+      impl::dfs(g, v, visitor, visited);
     }
 
   } // namespace algorithm
