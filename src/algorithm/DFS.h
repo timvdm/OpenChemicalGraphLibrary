@@ -5,7 +5,7 @@
 
 /**
  * @file DFS.h
- * @brief Depth-first search algorithm.
+ * @brief Depth-first search algorithms.
  */
 
 namespace ocgl {

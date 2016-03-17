@@ -11,6 +11,7 @@ set(OCGL_HDRS
   model/ObjectGraph.h
 
   algorithm/DFS.h
+  algorithm/ConnectedComponents.h
 )
 
 copy_headers("${OCGL_HDRS}" ocgl)
