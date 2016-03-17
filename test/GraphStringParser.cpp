@@ -1,19 +1,8 @@
 #include <ocgl/GraphStringParser.h>
-#include <ocgl/model/PointerGraph.h>
-#include <ocgl/model/IdGraph.h>
-#include <ocgl/model/ObjectGraph.h>
 
-#include <gtest/gtest.h>
+#include "test.h"
 
-using GraphModels = ::testing::Types<
-  ocgl::model::PointerGraph,
-  ocgl::model::IdGraph,
-  ocgl::model::ObjectGraph
->;
-
-template<typename T> class GraphStringParserTest : public ::testing::Test {};
-
-TYPED_TEST_CASE(GraphStringParserTest, GraphModels);
+GRAPH_TYPED_TEST(GraphStringParserTest);
 
 TYPED_TEST(GraphStringParserTest, SingleVertex)
 {

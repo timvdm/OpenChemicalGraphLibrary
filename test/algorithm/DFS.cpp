@@ -1,21 +1,8 @@
 #include <ocgl/algorithm/DFS.h>
-#include <ocgl/GraphStringParser.h>
 
-#include <ocgl/model/PointerGraph.h>
-#include <ocgl/model/IdGraph.h>
-#include <ocgl/model/ObjectGraph.h>
+#include "../test.h"
 
-#include <gtest/gtest.h>
-
-using GraphModels = ::testing::Types<
-  ocgl::model::PointerGraph,
-  ocgl::model::IdGraph,
-  ocgl::model::ObjectGraph
->;
-
-template<typename T> class DFSTest : public ::testing::Test {};
-
-TYPED_TEST_CASE(DFSTest, GraphModels);
+GRAPH_TYPED_TEST(DFSTest);
 
 template<typename Graph>
 struct DFSVisitor : public ocgl::algorithm::DFSVisitor<Graph>

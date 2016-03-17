@@ -1,19 +1,8 @@
-#include <ocgl/model/ObjectGraph.h>
-#include <ocgl/model/IdGraph.h>
-#include <ocgl/model/PointerGraph.h>
 #include <ocgl/GraphTraits.h>
 
-#include <gtest/gtest.h>
+#include "../test.h"
 
-using GraphModels = ::testing::Types<
-  ocgl::model::PointerGraph,
-  ocgl::model::IdGraph,
-  ocgl::model::ObjectGraph
->;
-
-template<typename T> class GraphTest : public ::testing::Test {};
-
-TYPED_TEST_CASE(GraphTest, GraphModels);
+GRAPH_TYPED_TEST(GraphTest);
 
 // test:
 //   addVertex
