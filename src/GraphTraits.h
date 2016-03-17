@@ -13,7 +13,7 @@
 
 /**
  * @namespace ocgl
- * @brief Namespace ocgl
+ * @brief Open Chemical Graph Library namespace.
  */
 namespace ocgl {
 

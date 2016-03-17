@@ -9,6 +9,8 @@ set(OCGL_HDRS
   model/PointerGraph.h
   model/IdGraph.h
   model/ObjectGraph.h
+
+  algorithm/DFS.h
 )
 
 copy_headers("${OCGL_HDRS}" ocgl)
