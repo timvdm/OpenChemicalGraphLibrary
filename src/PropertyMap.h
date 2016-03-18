@@ -36,14 +36,6 @@ namespace ocgl {
       using ConstReference = typename std::vector<T>::const_reference;
 
       /**
-       * @brief Get the graph.
-       */
-      const Graph& graph() const
-      {
-        return m_graph;
-      }
-
-      /**
        * @brief Constructor.
        *
        * @param graph The graph.
@@ -51,6 +43,26 @@ namespace ocgl {
       PropertyMap(const Graph &graph) : m_graph(graph)
       {
         init(VertexOrEdgeTag());
+      }
+
+      /**
+       * @brief Constructor.
+       *
+       * @param graph The graph.
+       * @param value The initial property value.
+       */
+      PropertyMap(const Graph &graph, const T &value) : m_graph(graph)
+      {
+        init(VertexOrEdgeTag());
+        std::fill(m_props.begin(), m_props.end(), value);
+      }
+
+      /**
+       * @brief Get the graph.
+       */
+      const Graph& graph() const
+      {
+        return m_graph;
       }
 
       /**
