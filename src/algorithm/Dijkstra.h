@@ -42,9 +42,9 @@ namespace ocgl {
      * @brief Dijkstra's shortest path algorithm.
      *
      * The Dijkstra shortest path algorithm finds a shortest path from a source
-     * vertex to all other vertices in a graph. The algorithm is executed when the
-     * constructor is executed. Later, the distances and paths can be retrieved
-     * using the distance() and path() member functions.
+     * vertex to all other vertices in a graph. The algorithm is executed when
+     * the constructor is executed. Later, the distances and paths can be
+     * retrieved using the distance() and path() member functions.
      */
     template<typename Graph>
     class Dijkstra
@@ -64,9 +64,7 @@ namespace ocgl {
          * @param source The source vertex.
          */
         Dijkstra(const Graph &g, Vertex source)
-          : m_graph(g), m_source(source),
-            //m_dist(g, std::numeric_limits<unsigned int>::max()),
-            m_dist(g, infinity()),
+          : m_graph(g), m_source(source), m_dist(g, infinity()),
             m_prev(g, nullVertex<Graph>())
         {
           // add all vertices in graph to Q
@@ -81,7 +79,8 @@ namespace ocgl {
         /**
          * @brief Constructor.
          *
-         * Using this constructor, only the vertices in the mask will be considered.
+         * Using this constructor, only the vertices in the mask will be
+         * considered.
          *
          * @param g The graph.
          * @param source The source vertex.
@@ -89,9 +88,8 @@ namespace ocgl {
          */
         Dijkstra(const Graph &g, Vertex source,
             const VertexPropertyMap<Graph, bool> &vertexMask)
-          : m_graph(g), m_source(source),
-            m_dist(g, std::numeric_limits<unsigned int>::max()),
-            m_prev(g)
+          : m_graph(g), m_source(source), m_dist(g, infinity()),
+            m_prev(g, nullVertex<Graph>())
         {
           // add all vertices in graph to Q
           std::vector<Vertex> Q;
@@ -136,7 +134,8 @@ namespace ocgl {
         /**
          * @brief Reconstruct the path between source and target vertices.
          *
-         * The path includes the source and target vertices (i.e. [source, ..., target]).
+         * The path includes the source and target vertices
+         * (i.e. [source, ..., target]).
          *
          * @param target the target vertex.
          */
