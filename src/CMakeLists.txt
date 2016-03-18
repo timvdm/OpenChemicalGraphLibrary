@@ -13,6 +13,7 @@ set(OCGL_HDRS
   algorithm/DFS.h
   algorithm/ConnectedComponents.h
   algorithm/Dijkstra.h
+  algorithm/CycleMembership.h
 )
 
 copy_headers("${OCGL_HDRS}" ocgl)
