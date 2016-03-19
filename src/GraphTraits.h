@@ -3,6 +3,7 @@
 
 #include <ocgl/Contract.h>
 #include <ocgl/Range.h>
+#include <ocgl/FilterIterator.h>
 
 #include <type_traits>
 
@@ -16,6 +17,11 @@
  * @brief Open Chemical Graph Library namespace.
  */
 namespace ocgl {
+
+  /**
+   * @brief The type for vertex and edge ids.
+   */
+  using Id = unsigned int;
 
   /**
    * @page graph_concept_page Graph Concept
@@ -206,7 +212,7 @@ namespace ocgl {
   }
 
   /**
-   * @brief Get an iterator pair over the graph's vertices.
+   * @brief Get an iterator range over the graph's vertices.
    *
    * This is a wrapper function around the get_vertices(g) function that needs
    * to be implemented for types that model the graph concept.
@@ -220,7 +226,24 @@ namespace ocgl {
   }
 
   /**
-   * @brief Get an iterator pair over the graph's edges.
+   * @brief Get an iterator range over the graph's vertices filtered by a
+   *        predicate.
+   *
+   * @param g The graph.
+   * @param predicate The predicate.
+   */
+  template<typename Graph, typename Predicate>
+  Range<FilterIterator<Graph, typename GraphTraits<Graph>::VertexIter, Predicate>>
+  getVertices(const Graph &g, const Predicate &predicate)
+  {
+    auto range = get_vertices(g);
+    auto begin = makeFilterIterator(g, range.begin(), range.end(), predicate);
+    auto end = makeFilterIterator(g, range.end(), range.end(), predicate);
+    return makeRange(begin, end);
+  }
+
+  /**
+   * @brief Get an iterator range over the graph's edges.
    *
    * This is a wrapper function around the get_edges(g) function that needs
    * to be implemented for types that model the graph concept.
@@ -231,6 +254,23 @@ namespace ocgl {
   Range<typename GraphTraits<Graph>::EdgeIter> getEdges(const Graph &g)
   {
     return get_edges(g);
+  }
+
+  /**
+   * @brief Get an iterator range over the graph's edges filtered by a
+   *        predicate.
+   *
+   * @param g The graph.
+   * @param predicate The predicate.
+   */
+  template<typename Graph, typename Predicate>
+  Range<FilterIterator<Graph, typename GraphTraits<Graph>::EdgeIter, Predicate>>
+  getEdges(const Graph &g, const Predicate &predicate)
+  {
+    auto range = get_edges(g);
+    auto begin = makeFilterIterator(g, range.begin(), range.end(), predicate);
+    auto end = makeFilterIterator(g, range.end(), range.end(), predicate);
+    return makeRange(begin, end);
   }
 
   /**
@@ -245,7 +285,7 @@ namespace ocgl {
    * @pre id < numVertexIds(g)
    */
   template<typename Graph>
-  typename GraphTraits<Graph>::Vertex getVertex(const Graph &g, unsigned int id)
+  typename GraphTraits<Graph>::Vertex getVertex(const Graph &g, Id id)
   {
     PRE_LT(id, numVertexIds(g));
 
@@ -264,7 +304,7 @@ namespace ocgl {
    * @pre id < numEdgeIds(g)
    */
   template<typename Graph>
-  typename GraphTraits<Graph>::Edge getEdge(const Graph &g, unsigned int id)
+  typename GraphTraits<Graph>::Edge getEdge(const Graph &g, Id id)
   {
     PRE_LT(id, numEdgeIds(g));
 
@@ -286,7 +326,7 @@ namespace ocgl {
    * @pre isValid(g, x)
    */
   template<typename Graph, typename VertexOrEdge>
-  unsigned int getId(const Graph &g, VertexOrEdge x)
+  Id getId(const Graph &g, VertexOrEdge x)
   {
     PRE(isValid(g, x));
 
@@ -313,7 +353,7 @@ namespace ocgl {
   }
 
   /**
-   * @brief Get an iterator pair over the vertex' incident edges.
+   * @brief Get an iterator range over the vertex' incident edges.
    *
    * This is a wrapper function around the get_incident(g, v) function that needs
    * to be implemented for types that model the graph concept.
@@ -333,7 +373,28 @@ namespace ocgl {
   }
 
   /**
-   * @brief Get an iterator pair over the vertex' adjacent vertices.
+   * @brief Get an iterator range over the vertex' incident edges filtered by a
+   *        predicate.
+   *
+   * @param g The graph.
+   * @param v The vertex.
+   * @param predicate The predicate.
+   *
+   * @pre isValid(g, v)
+   */
+  template<typename Graph, typename Predicate>
+  Range<FilterIterator<Graph, typename GraphTraits<Graph>::IncidentIter, Predicate>>
+  getIncident(const Graph &g, typename GraphTraits<Graph>::Vertex v,
+      const Predicate &predicate)
+  {
+    auto range = get_incident(g, v);
+    auto begin = makeFilterIterator(g, range.begin(), range.end(), predicate);
+    auto end = makeFilterIterator(g, range.end(), range.end(), predicate);
+    return makeRange(begin, end);
+  }
+
+  /**
+   * @brief Get an iterator range over the vertex' adjacent vertices.
    *
    * This is a wrapper function around the get_adjacent(g, v) function that needs
    * to be implemented for types that model the graph concept.
@@ -350,6 +411,27 @@ namespace ocgl {
     PRE(isValid(g, v));
 
     return get_adjacent(g, v);
+  }
+
+  /**
+   * @brief Get an iterator range over the vertex' adjacent vertices filtered by
+   *        a predicate.
+   *
+   * @param g The graph.
+   * @param v The vertex.
+   * @param predicate The predicate.
+   *
+   * @pre isValid(g, v)
+   */
+  template<typename Graph, typename Predicate>
+  Range<FilterIterator<Graph, typename GraphTraits<Graph>::AdjacentIter, Predicate>>
+  getAdjacent(const Graph &g, typename GraphTraits<Graph>::Vertex v,
+      const Predicate &predicate)
+  {
+    auto range = get_adjacent(g, v);
+    auto begin = makeFilterIterator(g, range.begin(), range.end(), predicate);
+    auto end = makeFilterIterator(g, range.end(), range.end(), predicate);
+    return makeRange(begin, end);
   }
 
   /**
