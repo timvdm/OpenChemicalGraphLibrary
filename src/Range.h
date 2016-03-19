@@ -61,6 +61,11 @@ namespace ocgl {
         return m_end;
       }
 
+      std::size_t size() const
+      {
+        return std::distance(m_begin, m_end);
+      }
+
       /**
        * @brief Construct a std::vector from the range.
        */
