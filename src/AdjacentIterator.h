@@ -55,13 +55,6 @@ namespace ocgl {
       using IncidentIter = typename GraphTraits<Graph>::IncidentIter;
 
       /**
-       * @brief Default constructor.
-       */
-      AdjacentIterator()
-      {
-      }
-
-      /**
        * @brief Constructor.
        *
        * @param g The graph.
