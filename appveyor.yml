@@ -1,0 +1,12 @@
+clone_folder: c:\ocgl
+
+build_script:
+  - cd c:\ocgl
+  - md build
+  - cd build
+  - cmake -G "Visual Studio 14 2015" ..
+  - msbuild
+
+test_script:
+  - cmd: ctest -VV
+
