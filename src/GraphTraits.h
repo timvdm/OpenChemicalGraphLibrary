@@ -6,6 +6,7 @@
 #include <ocgl/FilterIterator.h>
 
 #include <type_traits>
+#include <limits>
 
 /**
  * @file GraphTraits.h
@@ -18,9 +19,25 @@
  */
 namespace ocgl {
 
+  /**
+   * @brief The index type.
+   */
   using Index = unsigned int;
 
+  /**
+   * @brief The vertex index type.
+   *
+   * This is the same type as Index and is only provided to indicate that a
+   * vertex index is intended.
+   */
   using VertexIndex = Index;
+
+  /**
+   * @brief The vertex index type.
+   *
+   * This is the same type as Index and is only provided to indicate that a
+   * vertex index is intended.
+   */
   using EdgeIndex = Index;
 
   constexpr Index nullIndex()
