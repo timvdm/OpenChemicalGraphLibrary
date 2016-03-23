@@ -61,6 +61,9 @@ namespace ocgl {
         return m_end;
       }
 
+      /**
+       * @brief Get the number of elements in the range.
+       */
       std::size_t size() const
       {
         return std::distance(m_begin, m_end);

@@ -1,11 +1,11 @@
 #include <ocgl/PropertyMap.h>
-#include <ocgl/model/PointerGraph.h>
+#include <ocgl/model/IndexGraph.h>
 
 #include <gtest/gtest.h>
 
 TEST(PropertyMapTest, VertexPropertyMap)
 {
-  using Graph = ocgl::model::PointerGraph;
+  using Graph = ocgl::model::IndexGraph;
   using Vertex = typename ocgl::GraphTraits<Graph>::Vertex;
 
   Graph g;
@@ -34,7 +34,7 @@ TEST(PropertyMapTest, VertexPropertyMap)
 
 TEST(PropertyMapTest, EdgePropertyMap)
 {
-  using Graph = ocgl::model::PointerGraph;
+  using Graph = ocgl::model::IndexGraph;
 
   Graph g;
 

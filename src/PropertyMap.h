@@ -76,9 +76,9 @@ namespace ocgl {
       ConstReference operator[](VertexOrEdge x) const
       {
         PRE(isValid(m_graph, x));
-        PRE_LT(getId(m_graph, x), m_props.size());
+        PRE_LT(getIndex(m_graph, x), m_props.size());
 
-        return m_props[getId(m_graph, x)];
+        return m_props[getIndex(m_graph, x)];
       }
 
       /**
@@ -92,20 +92,20 @@ namespace ocgl {
       Reference operator[](VertexOrEdge x)
       {
         PRE(isValid(m_graph, x));
-        PRE_LT(getId(m_graph, x), m_props.size());
+        PRE_LT(getIndex(m_graph, x), m_props.size());
 
-        return m_props[getId(m_graph, x)];
+        return m_props[getIndex(m_graph, x)];
       }
 
     private:
       void init(impl::VertexTag)
       {
-        m_props.resize(numVertexIds(m_graph));
+        m_props.resize(numVertices(m_graph));
       }
 
       void init(impl::EdgeTag)
       {
-        m_props.resize(numEdgeIds(m_graph));
+        m_props.resize(numEdges(m_graph));
       }
 
       /**

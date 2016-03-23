@@ -18,10 +18,15 @@
  */
 namespace ocgl {
 
-  /**
-   * @brief The type for vertex and edge ids.
-   */
-  using Id = unsigned int;
+  using Index = unsigned int;
+
+  using VertexIndex = Index;
+  using EdgeIndex = Index;
+
+  constexpr Index nullIndex()
+  {
+    return std::numeric_limits<Index>::max();
+  }
 
   /**
    * @page graph_concept_page Graph Concept
@@ -29,19 +34,17 @@ namespace ocgl {
    *
    * num_vertices(g)
    * num_edges(g)
-   * num_vertex_ids(g)
-   * num_edge_ids(g)
    * get_vertices(g)
    * get_edges(g)
-   * get_vertex(g, id)
-   * get_edge(g, id)
+   * get_vertex(g, index)
+   * get_edge(g, index)
    *
-   * get_id(g, v)
+   * get_index(g, v)
    * get_degree(g, v)
    * get_incident(g, v)
    * get_adjacent(g, v)
    *
-   * get_id(g, e)
+   * get_index(g, e)
    * get_source(g, e)
    * get_target(g, e)
    *
@@ -174,44 +177,6 @@ namespace ocgl {
   }
 
   /**
-   * @brief Get the number of vertex ids.
-   *
-   * The number of vertex ids is equal to the number of ids that are already
-   * assigned to (possibly later removed) vertices. This count can be used to
-   * as the size for a std::vector such that a vertex id can be used as index
-   * into this std::vector.
-   *
-   * This is a wrapper function around the num_vertex_ids(g) function that needs
-   * to be implemented for types that model the graph concept.
-   *
-   * @param g The graph.
-   */
-  template<typename Graph>
-  unsigned int numVertexIds(const Graph &g)
-  {
-    return num_vertex_ids(g);
-  }
-
-  /**
-   * @brief Get the number of edge ids.
-   *
-   * The number of edge ids is equal to the number of ids that are already
-   * assigned to (possibly later removed) edges. This count can be used to
-   * as the size for a std::vector such that an edge id can be used as index
-   * into this std::vector.
-   *
-   * This is a wrapper function around the num_edge_ids(g) function that needs
-   * to be implemented for types that model the graph concept.
-   *
-   * @param g The graph.
-   */
-  template<typename Graph>
-  unsigned int numEdgeIds(const Graph &g)
-  {
-    return num_edge_ids(g);
-  }
-
-  /**
    * @brief Get an iterator range over the graph's vertices.
    *
    * This is a wrapper function around the get_vertices(g) function that needs
@@ -274,50 +239,51 @@ namespace ocgl {
   }
 
   /**
-   * @brief Get a vertex by id.
+   * @brief Get a vertex by index.
    *
-   * This is a wrapper function around the get_vertex(g) function that needs
+   * This is a wrapper function around the get_vertex(g, i) function that needs
    * to be implemented for types that model the graph concept.
    *
    * @param g The graph.
-   * @param id The vertex id.
+   * @param index The vertex index.
    *
-   * @pre id < numVertexIds(g)
+   * @pre index < numVertices(g)
    */
   template<typename Graph>
-  typename GraphTraits<Graph>::Vertex getVertex(const Graph &g, Id id)
+  typename GraphTraits<Graph>::Vertex getVertex(const Graph &g,
+      VertexIndex index)
   {
-    PRE_LT(id, numVertexIds(g));
+    PRE_LT(index, numVertices(g));
 
-    return get_vertex(g, id);
+    return get_vertex(g, index);
   }
 
   /**
-   * @brief Get an edge by id.
+   * @brief Get an edge by index.
    *
-   * This is a wrapper function around the get_edge(g) function that needs
+   * This is a wrapper function around the get_edge(g, i) function that needs
    * to be implemented for types that model the graph concept.
    *
    * @param g The graph.
-   * @param id The edge id.
+   * @param index The edge index.
    *
-   * @pre id < numEdgeIds(g)
+   * @pre index < numEdges(g)
    */
   template<typename Graph>
-  typename GraphTraits<Graph>::Edge getEdge(const Graph &g, Id id)
+  typename GraphTraits<Graph>::Edge getEdge(const Graph &g, EdgeIndex index)
   {
-    PRE_LT(id, numEdgeIds(g));
+    PRE_LT(index, numEdges(g));
 
-    return get_edge(g, id);
+    return get_edge(g, index);
   }
 
   template<typename Graph, typename VertexOrEdge>
   bool isValid(const Graph &g, VertexOrEdge x);
 
   /**
-   * @brief Get the vertex or edge id.
+   * @brief Get the vertex or edge index.
    *
-   * This is a wrapper function around the get_id(g, x) function that needs
+   * This is a wrapper function around the get_index(g, x) function that needs
    * to be implemented for types that model the graph concept.
    *
    * @param g The graph.
@@ -326,11 +292,11 @@ namespace ocgl {
    * @pre isValid(g, x)
    */
   template<typename Graph, typename VertexOrEdge>
-  Id getId(const Graph &g, VertexOrEdge x)
+  Index getIndex(const Graph &g, VertexOrEdge x)
   {
     PRE(isValid(g, x));
 
-    return get_id(g, x);
+    return get_index(g, x);
   }
 
   /**
