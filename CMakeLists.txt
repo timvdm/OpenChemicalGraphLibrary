@@ -26,15 +26,6 @@ set(CMAKE_CXX_FLAGS "-pedantic -Wall ${IGNORE_WARNINGS_FLAGS}")
 
 find_package(Threads)
 
-############################################################
-#
-# Testing
-#
-############################################################
-
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
-enable_testing()
 
 ############################################################
 #
@@ -52,6 +43,29 @@ if(DOXYGEN_FOUND)
   )
 endif()
 
+############################################################
+#
+# Library
+#
+############################################################
+
 add_subdirectory(src)
-add_subdirectory(test)
-add_subdirectory(examples)
+
+############################################################
+#
+# Testing
+#
+############################################################
+
+option(BUILD_TESTS "Build unittests (requires GTest)" OFF)
+if(${BUILD_TESTS})
+  find_package(GTest REQUIRED)
+  include_directories(${GTEST_INCLUDE_DIRS})
+  enable_testing()
+  add_subdirectory(test)
+endif()
+
+option(BUILD_EXAMPLES "Build examples" ON)
+if(${BUILD_EXAMPLES})
+  add_subdirectory(examples)
+endif()
