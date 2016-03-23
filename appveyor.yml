@@ -5,8 +5,5 @@ build_script:
   - md build
   - cd build
   - cmake -G "Visual Studio 14 2015" ..
-  - msbuild
-
-test_script:
-  - cmd: ctest -VV
+  - cmake --build .
 
