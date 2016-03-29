@@ -2,6 +2,7 @@
 #define OCGL_ALGORITHM_DIJKSTRA_H
 
 #include <ocgl/PropertyMap.h>
+#include <ocgl/Predicates.h>
 
 #include <algorithm>
 #include <vector>
@@ -68,9 +69,7 @@ namespace ocgl {
             m_prev(g, nullVertex<Graph>())
         {
           // add all vertices in graph to Q
-          std::vector<Vertex> Q;
-          for (auto v : getVertices(g))
-            Q.push_back(v);
+          std::vector<Vertex> Q = getVertices(g).toVector();
 
           VertexPropertyMap<Graph, bool> vertexMask(g, true);
           dijkstra(Q, vertexMask);
@@ -92,10 +91,8 @@ namespace ocgl {
             m_prev(g, nullVertex<Graph>())
         {
           // add all vertices in graph to Q
-          std::vector<Vertex> Q;
-          for (auto v : getVertices(g))
-            if (vertexMask[v])
-              Q.push_back(v);
+          std::vector<Vertex> Q = getVertices(g,
+              HasPropertyEQ(vertexMask, true)).toVector();
 
           dijkstra(Q, vertexMask);
         }
@@ -142,6 +139,7 @@ namespace ocgl {
         std::vector<Vertex> path(Vertex target) const
         {
           std::vector<Vertex> S;
+          S.reserve(distance(target) + 1);
           Vertex u = target;
 
           // reconstruct the path

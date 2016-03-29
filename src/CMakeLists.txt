@@ -7,6 +7,8 @@ set(OCGL_HDRS
   FilterIterator.h
   PropertyMap.h
   GraphStringParser.h
+  BitMatrix.h
+  Cycle.h
 
   predicate/HasProperty.h
   predicate/HasIndex.h
