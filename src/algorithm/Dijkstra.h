@@ -1,6 +1,7 @@
 #ifndef OCGL_ALGORITHM_DIJKSTRA_H
 #define OCGL_ALGORITHM_DIJKSTRA_H
 
+#include <ocgl/Path.h>
 #include <ocgl/PropertyMap.h>
 #include <ocgl/Predicates.h>
 
@@ -136,9 +137,9 @@ namespace ocgl {
          *
          * @param target the target vertex.
          */
-        std::vector<Vertex> path(Vertex target) const
+        VertexPath<Graph> path(Vertex target) const
         {
-          std::vector<Vertex> S;
+          VertexPath<Graph> S;
           S.reserve(distance(target) + 1);
           Vertex u = target;
 
@@ -149,6 +150,31 @@ namespace ocgl {
           }
 
           S.insert(S.begin(), m_source);
+
+          return S;
+        }
+
+        /**
+         * @brief Reconstruct the reverse path between target and source vertices.
+         *
+         * The path includes the source and target vertices
+         * (i.e. [target, ..., source]).
+         *
+         * @param target the target vertex.
+         */
+        VertexPath<Graph> reversePath(Vertex target) const
+        {
+          VertexPath<Graph> S;
+          S.reserve(distance(target) + 1);
+          Vertex u = target;
+
+          // reconstruct the path
+          while (isValid(m_graph, m_prev[u])) {
+            S.push_back(u);
+            u = m_prev[u];
+          }
+
+          S.push_back(m_source);
 
           return S;
         }
