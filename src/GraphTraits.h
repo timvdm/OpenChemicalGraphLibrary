@@ -6,7 +6,6 @@
 #include <ocgl/FilterIterator.h>
 
 #include <type_traits>
-#include <limits>
 
 /**
  * @file GraphTraits.h

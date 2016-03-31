@@ -5,9 +5,9 @@
 #include <ocgl/Range.h>
 #include <ocgl/AdjacentIterator.h>
 
+#include <algorithm>
 #include <vector>
 #include <limits>
-#include <algorithm>
 
 namespace ocgl {
 

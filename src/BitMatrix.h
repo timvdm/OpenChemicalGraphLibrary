@@ -6,6 +6,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <vector>
+#include <limits>
 
 /**
  * @file BitMatrix.h
