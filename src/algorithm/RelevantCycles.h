@@ -8,6 +8,8 @@
 #include <ocgl/algorithm/Dijkstra.h>
 #include <ocgl/algorithm/CycleMembership.h>
 
+#include <memory>
+
 /**
  * @file RelevantCycles.h
  * @brief Relevant cycles.
