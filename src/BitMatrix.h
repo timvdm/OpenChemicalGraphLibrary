@@ -16,7 +16,7 @@ namespace ocgl {
 
   /**
    * @class BitMatrix BitMatrix.h <ocgl/BitMatrix.h>
-   * @brief A bit matrix.
+   * @brief Matrix over GF(2).
    */
   class BitMatrix
   {

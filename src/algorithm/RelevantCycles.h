@@ -1,10 +1,17 @@
 #ifndef OCGL_ALGORITHM_RELEVANT_CYCLES_H
 #define OCGL_ALGORITHM_RELEVANT_CYCLES_H
 
+#include <ocgl/Path.h>
 #include <ocgl/Cycle.h>
+#include <ocgl/CycleSpace.h>
 #include <ocgl/BitMatrix.h>
 #include <ocgl/algorithm/Dijkstra.h>
 #include <ocgl/algorithm/CycleMembership.h>
+
+/**
+ * @file RelevantCycles.h
+ * @brief Relevant cycles.
+ */
 
 namespace ocgl {
 
@@ -195,20 +202,20 @@ namespace ocgl {
           /**
            * @brief Create an odd vertex cycle form paths to p and q.
            *
-           * @param rp The path (r .. p).
-           * @param rq The path (r .. q).
+           * @param pr The path (p .. r).
+           * @param qr The path (q .. r).
            *
            * @return The cycle (r .. p q ..).
            */
-          static VertexCycle<Graph> cycleFromPaths(const VertexPath<Graph> &rp,
-              const VertexPath<Graph> &rq)
+          static VertexCycle<Graph> cycleFromPaths(const VertexPath<Graph> &pr,
+              const VertexPath<Graph> &qr)
           {
             VertexCycle<Graph> cycle;
-            cycle.reserve(2 * rp.size() - 1);
+            cycle.reserve(2 * pr.size() - 1);
 
-            std::copy(rp.begin(), rp.end(),
+            std::copy(pr.rbegin(), pr.rend(),
                 std::back_inserter(cycle)); // P(r .. p)
-            std::copy(rq.rbegin(), rq.rbegin() + rq.size() - 1,
+            std::copy(qr.begin(), qr.begin() + qr.size() - 1,
                 std::back_inserter(cycle)); // P(r .. p q ..)
 
             return cycle;
@@ -217,22 +224,22 @@ namespace ocgl {
           /**
            * @brief Create an even vertex cycle form paths to p and q.
            *
-           * @param rp The path (r .. p).
+           * @param pr The path (p .. r).
            * @param x The x vertex.
-           * @param rq The path (r .. q).
+           * @param qr The path (q .. r).
            *
            * @return The cycle (r .. p x q ..).
            */
-          static VertexCycle<Graph> cycleFromPaths(const VertexPath<Graph> &rp,
-              Vertex x, const VertexPath<Graph> &rq)
+          static VertexCycle<Graph> cycleFromPaths(const VertexPath<Graph> &pr,
+              Vertex x, const VertexPath<Graph> &qr)
           {
             VertexCycle<Graph> cycle;
-            cycle.reserve(2 * rp.size());
+            cycle.reserve(2 * pr.size());
 
-            std::copy(rp.begin(), rp.end(),
+            std::copy(pr.rbegin(), pr.rend(),
                 std::back_inserter(cycle)); // P(r .. p)
             cycle.push_back(x); // P(r .. p x)
-            std::copy(rq.rbegin(), rq.rbegin() + rq.size() - 1,
+            std::copy(qr.begin(), qr.begin() + qr.size() - 1,
                 std::back_inserter(cycle)); // P(r .. p x q ..)
 
             return cycle;
@@ -243,17 +250,18 @@ namespace ocgl {
            */
           void enumerate(std::function<void(const VertexCycle<Graph>&)> callback) const
           {
-            listPaths(m_p, [&] (const VertexCycle<Graph> &rp) {
-              listPaths(m_q, [&] (const VertexCycle<Graph> &rq) {
-                VertexCycle<Graph> cycle;
+            std::vector<VertexPath<Graph>> qrPaths;
+            listPaths(m_q, [&qrPaths] (const VertexPath<Graph> &qr) {
+              qrPaths.push_back(qr);
+            });
 
+            listPaths(m_p, [&] (const VertexPath<Graph> &pr) {
+              for (auto &qr : qrPaths) {
                 if (isOdd())
-                  cycle = cycleFromPaths(rp, rq);
+                  callback(cycleFromPaths(pr, qr));
                 else
-                  cycle = cycleFromPaths(rp, m_x, rq);
-
-                callback(cycle);
-              });
+                  callback(cycleFromPaths(pr, m_x, qr));
+              }
             });
           }
 
@@ -264,8 +272,8 @@ namespace ocgl {
           void listPaths(Vertex x, VertexPath<Graph> &current,
               std::function<void(const VertexPath<Graph>&)> callback) const
           {
-            // add v at the head-end of current path
-            current.insert(current.begin(), x);
+            // add v to the current path
+            current.push_back(x);
 
             if (x == m_r) {
               // found a path (r .. x)
@@ -277,7 +285,7 @@ namespace ocgl {
                   listPaths(getVertex(*m_graph, zi), current, callback);
             }
 
-            current.erase(current.begin());
+            current.pop_back();
           }
 
           /**
@@ -287,6 +295,7 @@ namespace ocgl {
               std::function<void(const VertexPath<Graph>&)> callback) const
           {
             VertexPath<Graph> current;
+            current.reserve(m_prototype.size() / 2);
             listPaths(x, current, callback);
           }
 
@@ -300,82 +309,15 @@ namespace ocgl {
       };
 
       /**
-       * @brief Check if a cycle is relevant.
-       *
-       * @param g The graph.
-       * @param B Basis for the cycle space.
-       * @param cycle The cycle to check.
-       */
-      template<typename Graph>
-      bool isCycleRelevant(const Graph &g, const BitMatrix &B,
-          const VertexCycle<Graph> &cycle)
-      {
-        // copy B
-        BitMatrix m(B);
-
-        // add cycle to B as new row
-        int row = m.rows();
-        m.addRow();
-        for (auto e : edgeCycleFromVertexCycle(g, cycle))
-          m.set(row, getIndex(g, e));
-
-        // perform gaussian eliminate
-        int rank = m.rows();
-        bool relevant = (rank == m.eliminate());
-
-        return relevant;
-      }
-
-      /**
-       * This function checks to ensure that all cylic edges are covered by the
-       * current cycle set. A simple example where this is needed:
-       *
-       *          6
-       *         /|
-       * 0 ---- 1 +--- 2           C ---- D ---- E
-       * |        7    |          /               \
-       * |       /     |        /                  \
-       * 5 ---- 4 ---- 3       8 ---- 9 ---- A ---- B
-       *
-       * cyclomatic number: 16 - 15 + 2 = 3
-       *
-       * 6-membered cycles:
-       *   0 1 2 3 4 5
-       *   0 1 6 7 4 5
-       *   1 2 3 4 7 6
-       *
-       * 7-membered cycle:
-       *   8 9 A B C D E
-       *
-       * When all relevant 6-membered cycles are added to the cycle set, the
-       * edges of the 7-membered cycle are not yet covered by the cycle set.
-       * The algorithm will continue to add 7-membered cycles to complete the
-       * set.
-       */
-      /*
-      template<typename Graph>
-      bool isCyclesetComplete(const Graph &g,
-          const EdgePropertyMap<Graph, bool> &coveredEdges,
-          const EdgePropertyMap<Graph, bool> &cycleMembership)
-      {
-        for (auto e : getEdges(g))
-          if (cycleMembership[e] && !coveredEdges[e])
-            return false;
-
-        return true;
-      }
-      */
-
-      /**
        * @brief Find the initial Vismara cycle families.
        *
        * @param graph The graph.
-       * @param cyclomaticNumber The cyclomatic number.
+       * @param circuitRank The circuit rank.
        * @param cycleMembership Vertex and edge cycle membership.
        */
       template<typename Graph>
       std::vector<CycleFamily<Graph>> initialCycleFamilies(const Graph &g,
-          unsigned int cyclomaticNumber,
+          unsigned int circuitRank,
           const VertexEdgePropertyMap<Graph, bool> &cycleMembership)
       {
         using Vertex = typename GraphTraits<Graph>::Vertex;
@@ -451,7 +393,7 @@ namespace ocgl {
 
                 // add to CI' the odd cycle C = P(r, y) + P(r, z) + (z, y)
                 auto prototype = impl::CycleFamily<Graph>::cycleFromPaths(
-                    dijkstra.path(y), dijkstra.path(z));
+                    dijkstra.reversePath(y), dijkstra.reversePath(z));
 
                 families.push_back(impl::CycleFamily<Graph>(g, r, y, z,
                       prototype, Dr));
@@ -468,7 +410,7 @@ namespace ocgl {
 
                 // add to CI' the even cycle C = P(r .. p) + P(r .. q) + (p, y, q)
                 auto prototype = impl::CycleFamily<Graph>::cycleFromPaths(
-                    dijkstra.path(p), y, dijkstra.path(q));
+                    dijkstra.reversePath(p), y, dijkstra.reversePath(q));
 
                 families.push_back(impl::CycleFamily<Graph>(g, r, p, q, y,
                       prototype, Dr));
@@ -490,7 +432,7 @@ namespace ocgl {
        * @post families contains only relevant cycle families.
        */
       template<typename Graph>
-      void selectRelevantCycleFamilies(const Graph &g,
+      void selectRelevantCycleFamilies(const Graph &g, unsigned int circuitRank,
           std::vector<CycleFamily<Graph>> &families)
       {
         // if there are no families, there is nothing to do..
@@ -505,62 +447,42 @@ namespace ocgl {
         // keep track of families that are relevant and not yet added to B
         // (i.e. families of the current cycle size being considered)
         std::vector<std::size_t> add;
-        // the matrix representing the cycle space of cycles smaller than the
-        // current cycle size
-        BitMatrix B_less(numEdges(g));
+        // the cycle space of cycles smaller than the current cycle size
+        CycleSpace<Graph> cycleSpace(g, circuitRank);
 
 
         unsigned int lastSize = families.front().prototype().size();
         for (std::size_t i = 0; i < families.size(); ++i) {
           const impl::CycleFamily<Graph> &family = families[i];
 
-          // update B_less
+          // update cycleSpace
           if (lastSize < family.prototype().size()) {
+            // add newly added relevant family prototypes to cycleSpace
+            for (auto j : add)
+              cycleSpace.add(families[j].prototype());
+            add.clear();
 
-            /*
-            if (cycles.size() >= cyclomaticNumber &&
-                impl::isCyclesetComplete(g, cycles, cycleMembership.edges)) {
-
+            // check if the cycle set is complete
+            if (cycleSpace.isBasis()) {
+              // all remaining families are not relevant
               while (i < families.size()) {
                 remove.push_back(i);
                 ++i;
               }
-
               break;
             }
-            */
 
-            // add newly added relevant family prototypes to B_less
-            for (auto j : add) {
-              int row = B_less.rows();
-              B_less.addRow();
-              for (auto e : edgeCycleFromVertexCycle(g, families[j].prototype()))
-                B_less.set(row, getIndex(g, e));
-            }
-
-            // run gaussian elimination on B_less
-            int rank = B_less.eliminate();
-            while (B_less.rows() > rank)
-              B_less.popRow();
-
+            // update last cycle size
             lastSize = family.prototype().size();
-            add.clear();
           }
 
-          if (!impl::isCycleRelevant(g, B_less, family.prototype()))
+          if (cycleSpace.contains(family.prototype()))
             remove.push_back(i);
-          else {
+          else
             add.push_back(i);
-
-            /*
-            family.enumerate([&] (const VertexCycle<Graph> &cycle) {
-              cycles.push_back(cycle);
-            });
-            */
-
-          }
         }
 
+        // remove all families that are not relevant
         for (std::size_t i = 0; i < remove.size(); ++i)
           families.erase(families.begin() + remove[remove.size() - i - 1]);
       }
@@ -570,25 +492,25 @@ namespace ocgl {
     /**
      * @brief Find the relevant cycles using Vismara algorithm.
      *
-     * @param graph The graph.
-     * @param cyclomaticNumber The cyclomatic number.
+     * @param g The graph.
+     * @param circuitRank The circuit rank.
      * @param cycleMembership Vertex and edge cycle membership.
      *
      * @return The set of relevant cycles.
      */
     template<typename Graph>
-    VertexCycles<Graph> relevantCyclesVismara(const Graph &g, unsigned int cyclomaticNumber,
+    VertexCycleList<Graph> relevantCyclesVismara(const Graph &g, unsigned int circuitRank,
         const VertexEdgePropertyMap<Graph, bool> &cycleMembership)
     {
       // find initial set of cycle families
       std::vector<impl::CycleFamily<Graph>> families =
-        impl::initialCycleFamilies(g, cyclomaticNumber, cycleMembership);
+        impl::initialCycleFamilies(g, circuitRank, cycleMembership);
 
       // select relevant families
-      impl::selectRelevantCycleFamilies(g, families);
+      impl::selectRelevantCycleFamilies(g, circuitRank, families);
 
       // enumerate relevant cycles
-      VertexCycles<Graph> cycles;
+      VertexCycleList<Graph> cycles;
       for (auto &family : families)
         family.enumerate([&cycles] (const VertexCycle<Graph> &cycle) {
           cycles.push_back(cycle);
@@ -609,10 +531,10 @@ namespace ocgl {
      * @return The set of relevant cycles.
      */
     template<typename Graph>
-    VertexCycles<Graph> relevantCycles(const Graph &graph)
+    VertexCycleList<Graph> relevantCycles(const Graph &graph)
     {
       auto cycleMember = cycleMembership(graph);
-      return relevantCyclesVismara(graph, cyclomaticNumber(graph),
+      return relevantCyclesVismara(graph, circuitRank(graph),
           cycleMember);
     }
 

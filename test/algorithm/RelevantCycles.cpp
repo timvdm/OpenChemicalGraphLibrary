@@ -25,18 +25,31 @@ std::ostream& operator<<(std::ostream &os, const TestCycle &cycle)
 
 template<typename Graph>
 bool isSameCycle(const Graph &g, const TestCycle &testCycle,
-    const std::vector<typename ocgl::GraphTraits<Graph>::Vertex> &cycle)
+    const ocgl::VertexCycle<Graph> &cycle)
 {
   if (testCycle.edges.size() != cycle.size())
     return false;
 
-  auto edgeCycle = ocgl::edgeCycleFromVertexCycle(g, cycle);
+  std::vector<ocgl::EdgeIndex> edges;
+  for (auto e : cycle.edges(g))
+    edges.push_back(ocgl::getIndex(g, e));
 
-  for (auto e : edgeCycle)
-    if (std::find(testCycle.edges.begin(), testCycle.edges.end(), e) == testCycle.edges.end())
-      return false;
+  auto it = std::find(edges.begin(), edges.end(), testCycle.edges.front());
+  if (it == edges.end())
+    return false;
 
-  return true;
+  std::rotate(edges.begin(), it, edges.end());
+
+  if (std::equal(edges.begin(), edges.end(), testCycle.edges.begin()))
+    return true;
+
+  std::rotate(edges.begin(), edges.begin() + 1, edges.end());
+  std::reverse(edges.begin(), edges.end());
+
+  if (std::equal(edges.begin(), edges.end(), testCycle.edges.begin()))
+    return true;
+
+  return false;
 }
 
 template<typename Graph>
@@ -55,7 +68,7 @@ bool testRelevantCycles(const std::string &str, std::initializer_list<TestCycle>
   std::cout << "relevant cycles:" << std::endl;
   for (auto &cycle : cycles) {
     std::cout << "    Cycle [ ";
-    for (auto e : cycle)
+    for (auto e : cycle.edges(g))
       std::cout << ocgl::getIndex(g, e) << " ";
     std::cout << "]" << std::endl;
   }
@@ -102,13 +115,13 @@ TYPED_TEST(RelevantCyclesTest, Figueras3)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
         "*1**2***3***4***5***6***1*7*6*5*4*3*27", {
-        TestCycle({0, 1, 17, 18, 28, 29}),
-        TestCycle({2, 3, 4, 26, 27, 28}),
-        TestCycle({5, 6, 7, 24, 25, 26}),
-        TestCycle({8, 9, 10, 22, 23, 24}),
-        TestCycle({11, 12, 13, 20, 21, 22}),
-        TestCycle({14, 15, 16, 18, 19, 20}),
-        TestCycle({19, 21, 23, 25, 27, 29})
+        TestCycle({ 24, 8, 9, 10, 22, 23 }),
+        TestCycle({ 28, 2, 3, 4, 26, 27 }),
+        TestCycle({ 20, 14, 15, 16, 18, 19 }),
+        TestCycle({ 28, 1, 0, 17, 18, 29 }),
+        TestCycle({ 22, 11, 12, 13, 20, 21 }),
+        TestCycle({ 26, 5, 6, 7, 24, 25 }),
+        TestCycle({ 29, 19, 21, 23, 25, 27 })
   }));
 }
 
@@ -117,7 +130,7 @@ TYPED_TEST(RelevantCyclesTest, Figueras4)
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
         "*12***(*2)**1", {
         TestCycle({0, 1, 2, 3, 4}),
-        TestCycle({3, 4, 5, 6, 7})
+        TestCycle({7, 4, 3, 5, 6})
   }));
 }
   
@@ -125,16 +138,14 @@ TYPED_TEST(RelevantCyclesTest, Figueras5)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
         "*123***(**2)(**3)**1", {
-        TestCycle({0, 1, 2, 3, 4, 5}),
-        TestCycle({0, 1, 2, 6, 7, 8}),
-        TestCycle({0, 1, 2, 9, 10, 11}),
-        TestCycle({3, 4, 5, 6, 7, 8}),
-        TestCycle({3, 4, 5, 9, 10, 11}),
-        TestCycle({6, 7, 8, 9, 10, 11})
+        TestCycle({ 5, 0, 1, 2, 3, 4 }),
+        TestCycle({ 8, 0, 1, 2, 6, 7 }),
+        TestCycle({ 7, 6, 3, 4, 5, 8 }),
+        TestCycle({ 11, 0, 1, 2, 9, 10 }),
+        TestCycle({ 10, 9, 3, 4, 5, 11 }),
+        TestCycle({ 10, 9, 6, 7, 8, 11 })
   }));
 }
-
-
 
 TYPED_TEST(RelevantCyclesTest, Figueras6)
 {
@@ -149,13 +160,13 @@ TYPED_TEST(RelevantCyclesTest, Figueras7)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
       "*1*(*2)*3*(*4)*5*(**6)***6*5*4*3*2*1", {
-      TestCycle({0, 1, 20, 21, 22}),
-      TestCycle({1, 2, 18, 19, 20}),
-      TestCycle({3, 4, 16, 17, 18}),
-      TestCycle({4, 5, 14, 15, 16}),
-      TestCycle({6, 7, 8, 12, 13, 14}),
-      TestCycle({6, 9, 10, 11, 13, 14}),
-      TestCycle({7, 8, 9, 10, 11, 12})
+      TestCycle({ 19, 18, 2, 1, 20 }),
+      TestCycle({ 21, 20, 1, 0, 22 }),
+      TestCycle({ 17, 16, 4, 3, 18 }),
+      TestCycle({ 15, 14, 5, 4, 16 }),
+      TestCycle({ 14, 6, 9, 10, 11, 13 }),
+      TestCycle({ 12, 8, 7, 9, 10, 11 }),
+      TestCycle({ 14, 6, 7, 8, 12, 13 })
   }));
 }
 
@@ -164,8 +175,8 @@ TYPED_TEST(RelevantCyclesTest, Figueras8)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
         "*12***(*1)***2", {
-        TestCycle({0, 1, 2, 3, 4}),
-        TestCycle({3, 4, 5, 6, 7, 8})
+        TestCycle({ 3, 2, 1, 0, 4 }),
+        TestCycle({ 8, 4, 3, 5, 6, 7 })
   }));
 }
 
@@ -173,9 +184,9 @@ TYPED_TEST(RelevantCyclesTest, Figueras9)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
         "*12***(**1)****2", {
-        TestCycle({0, 1, 2, 3, 4, 5}),
-        TestCycle({3, 4, 5, 6, 7, 8, 9, 10}),
-        TestCycle({0, 1, 2, 6, 7, 8, 9, 10})
+        TestCycle({ 5, 0, 1, 2, 3, 4 }),
+        TestCycle({ 10, 0, 1, 2, 6, 7, 8, 9 }),
+        TestCycle({ 10, 5, 4, 3, 6, 7, 8, 9 })
   }));
 }
 
@@ -184,10 +195,10 @@ TYPED_TEST(RelevantCyclesTest, Figueras10)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
         "*12***(*3**1)*3**2", {
-        TestCycle({0, 1, 2, 7, 9, 10, 11}),
-        TestCycle({3, 7, 8}),
-        TestCycle({4, 5, 6, 8, 9, 10, 11}),
-        TestCycle({0, 1, 2, 3, 4, 5, 6})
+        TestCycle({ 8, 3, 7 }),
+        TestCycle({ 5, 4, 3, 2, 1, 0, 6 }),
+        TestCycle({ 10, 9, 7, 2, 1, 0, 11 }),
+        TestCycle({ 11, 6, 5, 4, 8, 9, 10 })
   }));
 }
 
@@ -195,9 +206,9 @@ TYPED_TEST(RelevantCyclesTest, Figueras11)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
         "*1*2*3****3*(*2)**1", {
-        TestCycle({0, 8, 9, 10, 11, 12}),
-        TestCycle({1, 6, 7, 8, 9}),
-        TestCycle({2, 3, 4, 5, 6})
+        TestCycle({ 5, 4, 3, 2, 6 }),
+        TestCycle({ 8, 7, 6, 1, 9 }),
+        TestCycle({ 11, 10, 8, 9, 0, 12 })
   }));
 }
 
@@ -205,10 +216,10 @@ TYPED_TEST(RelevantCyclesTest, Figueras12)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
         "*1***2*3****(**4)*3**2*41", {
-        TestCycle({0, 1, 2, 14, 15, 17}),
-        TestCycle({3, 11, 12, 13, 14}),
-        TestCycle({4, 5, 6, 7, 10, 11}),
-        TestCycle({8, 9, 10, 12, 13, 15, 16})
+        TestCycle({ 13, 12, 11, 3, 14 }),
+        TestCycle({ 11, 4, 5, 6, 7, 10 }),
+        TestCycle({ 17, 0, 1, 2, 14, 15 }),
+        TestCycle({ 15, 13, 12, 10, 8, 9, 16 })
   }));
 }
 
@@ -242,12 +253,12 @@ TYPED_TEST(RelevantCyclesTest, Figueras15)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
         "*12*3*4*1*5*4*3*25", {
-        TestCycle({0, 8, 9, 10}),
-        TestCycle({1, 6, 7, 8}),
-        TestCycle({2, 4, 5, 6}),
-        TestCycle({3, 4, 10, 11}),
-        TestCycle({0, 1, 2, 3}),
-        TestCycle({5, 7, 9, 11})
+        TestCycle({ 3, 0, 1, 2 }),
+        TestCycle({ 10, 3, 4, 11 }),
+        TestCycle({ 6, 2, 4, 5 }),
+        TestCycle({ 8, 1, 6, 7 }),
+        TestCycle({ 10, 0, 8, 9 }),
+        TestCycle({ 11, 5, 7, 9 })
   }));
 }
 
@@ -255,13 +266,13 @@ TYPED_TEST(RelevantCyclesTest, Figueras16)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
         "*12*3*4*5*6*1*27*65*437", {
-        TestCycle({0, 7, 13, 14}),
-        TestCycle({1, 12, 13}),
-        TestCycle({2, 10, 11, 12}),
-        TestCycle({3, 9, 10}),
-        TestCycle({4, 6, 8, 9}),
-        TestCycle({5, 6, 7}),
-        TestCycle({8, 11, 14})
+        TestCycle({ 11, 8, 14 }),
+        TestCycle({ 12, 1, 13 }),
+        TestCycle({ 6, 5, 7 }),
+        TestCycle({ 9, 3, 10 }),
+        TestCycle({ 9, 4, 6, 8 }),
+        TestCycle({ 13, 0, 7, 14 }),
+        TestCycle({ 12, 2, 10, 11 })
   }));
 }
 
@@ -269,12 +280,12 @@ TYPED_TEST(RelevantCyclesTest, Figueras17)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
         "*12*3*4*5*6*1*2*(*65)*43", {
-        TestCycle({0, 7, 8, 12, 14}),
-        TestCycle({2, 9, 11, 12, 13}),
-        TestCycle({4, 6, 8, 9, 10}),
-        TestCycle({1, 13, 14}),
-        TestCycle({3, 10, 11}),
-        TestCycle({5, 6, 7})
+        TestCycle({ 13, 1, 14 }),
+        TestCycle({ 10, 3, 11 }),
+        TestCycle({ 6, 5, 7 }),
+        TestCycle({ 12, 9, 11, 2, 13 }),
+        TestCycle({ 12, 8, 7, 0, 14 }),
+        TestCycle({ 9, 8, 6, 4, 10 })
   }));
 }
 
@@ -282,14 +293,14 @@ TYPED_TEST(RelevantCyclesTest, Figueras18)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
         "*12*3*4*1*56*47****37*25***6", {
-        TestCycle({0, 11, 13, 14}),
-        TestCycle({1, 6, 11, 12}),
-        TestCycle({2, 4, 5, 6}),
-        TestCycle({3, 4, 14, 15}),
-        TestCycle({0, 1, 2, 3}),
-        TestCycle({5, 12, 13, 15}),
-        TestCycle({7, 8, 9, 10, 12}),
-        TestCycle({15, 16, 17, 18, 19})
+        TestCycle({ 3, 0, 1, 2 }),
+        TestCycle({ 15, 5, 12, 13 }),
+        TestCycle({ 6, 2, 4, 5 }),
+        TestCycle({ 11, 1, 6, 12 }),
+        TestCycle({ 14, 3, 4, 15 }),
+        TestCycle({ 14, 0, 11, 13 }),
+        TestCycle({ 10, 9, 8, 7, 12 }),
+        TestCycle({ 18, 17, 16, 15, 19 })
   }));
 }
 
@@ -328,12 +339,12 @@ TYPED_TEST(RelevantCyclesTest, VismaraPage7)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
       "*1*(**2)***2****(**3)***31", {
-      TestCycle({1, 2, 3, 4, 5, 6}),
-      TestCycle({11, 12, 13, 14, 15, 16}),
-      TestCycle({0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 16, 17}),
-      TestCycle({0, 1, 2, 6, 7, 8, 9, 10, 13, 14, 15, 17}),
-      TestCycle({0, 3, 4, 5, 7, 8, 9, 10, 11, 12, 16, 17}),
-      TestCycle({0, 3, 4, 5, 7, 8, 9, 10, 13, 14, 15, 17})
+      TestCycle({ 6, 2, 1, 3, 4, 5 }),
+      TestCycle({ 16, 12, 11, 13, 14, 15 }),
+      TestCycle({ 17, 0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 16 }),
+      TestCycle({ 17, 0, 1, 2, 6, 7, 8, 9, 10, 13, 14, 15 }),
+      TestCycle({ 17, 0, 3, 4, 5, 7, 8, 9, 10, 11, 12, 16 }),
+      TestCycle({ 17, 0, 3, 4, 5, 7, 8, 9, 10, 13, 14, 15 })
   }));
 }
 
@@ -372,15 +383,15 @@ TYPED_TEST(RelevantCyclesTest, BergerFig2b)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
       "*1*23*45**67*18*69*74*52*389", {
-      TestCycle({0, 5, 15, 16}),
-      TestCycle({1, 12, 13}),
-      TestCycle({2, 3, 9, 10}),
-      TestCycle({4, 6, 7}),
-      TestCycle({7, 8, 9}),
-      TestCycle({10, 11, 12}),
-      TestCycle({13, 14, 15}),
-      TestCycle({6, 16, 17}),
-      TestCycle({8, 11, 14, 17})
+      TestCycle({ 14, 13, 15 }),
+      TestCycle({ 11, 10, 12 }),
+      TestCycle({ 6, 4, 7 }),
+      TestCycle({ 17, 6, 16 }),
+      TestCycle({ 12, 1, 13 }),
+      TestCycle({ 8, 7, 9 }),
+      TestCycle({ 10, 2, 3, 9 }),
+      TestCycle({ 15, 0, 5, 16 }),
+      TestCycle({ 17, 8, 11, 14 })
   }));
 }
 
@@ -388,14 +399,14 @@ TYPED_TEST(RelevantCyclesTest, BergerFig4a)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
       "*1*23*4*5*16*7*2*8*7*6*5*4*38", {
-      TestCycle({0, 1, 2, 3, 4}),
-      TestCycle({0, 4, 5, 6, 7}),
-      TestCycle({1, 16, 17, 18}),
-      TestCycle({2, 14, 15, 16}),
-      TestCycle({3, 12, 13, 14}),
-      TestCycle({5, 10, 11, 12}),
-      TestCycle({6, 8, 9, 10}),
-      TestCycle({7, 8, 18, 19})
+      TestCycle({ 16, 2, 14, 15 }),
+      TestCycle({ 18, 7, 8, 19 }),
+      TestCycle({ 18, 1, 16, 17 }),
+      TestCycle({ 14, 3, 12, 13 }),
+      TestCycle({ 12, 5, 10, 11 }),
+      TestCycle({ 10, 6, 8, 9 }),
+      TestCycle({ 3, 2, 1, 0, 4 }),
+      TestCycle({ 6, 5, 4, 0, 7 })
   }));
 }
 
@@ -464,11 +475,11 @@ TYPED_TEST(RelevantCyclesTest, BergerFig7a)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
       "*12***3*1***32", {
-      TestCycle({3, 4, 8, 9}),
-      TestCycle({0, 1, 2, 3, 4}),
-      TestCycle({0, 1, 2, 8, 9}),
-      TestCycle({3, 5, 6, 7, 8}),
-      TestCycle({4, 5, 6, 7, 9})
+      TestCycle({ 8, 3, 4, 9 }),
+      TestCycle({ 3, 2, 1, 0, 4 }),
+      TestCycle({ 8, 2, 1, 0, 9 }),
+      TestCycle({ 7, 6, 5, 4, 9 }),
+      TestCycle({ 7, 6, 5, 3, 8 })
   }));
 }
 
@@ -476,15 +487,15 @@ TYPED_TEST(RelevantCyclesTest, BergerFig7b)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
       "*12**3**4**(*1)*56*47*38*25*9**8**7**6*9", {
-      TestCycle({0, 1, 12, 13, 14}),
-      TestCycle({2, 3, 10, 11, 12}),
-      TestCycle({4, 5, 8, 9, 10}),
-      TestCycle({6, 7, 8, 14, 15}),
-      TestCycle({9, 22, 23, 24, 25}),
-      TestCycle({11, 19, 20, 21, 22}),
-      TestCycle({13, 16, 17, 18, 19}),
-      TestCycle({15, 16, 25, 26, 27}),
-      TestCycle({9, 11, 13, 15})
+      TestCycle({ 15, 9, 11, 13 }),
+      TestCycle({ 13, 12, 1, 0, 14 }),
+      TestCycle({ 9, 8, 5, 4, 10 }),
+      TestCycle({ 11, 10, 3, 2, 12 }),
+      TestCycle({ 24, 23, 22, 9, 25 }),
+      TestCycle({ 18, 17, 16, 13, 19 }),
+      TestCycle({ 21, 20, 19, 11, 22 }),
+      TestCycle({ 14, 7, 6, 8, 15 }),
+      TestCycle({ 27, 16, 15, 25, 26 })
   }));
 }
 
@@ -492,13 +503,13 @@ TYPED_TEST(RelevantCyclesTest, BergerFig8a)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
       "*12*3*4**5**6**1*7*6*5*4**3**2*7", {
-      TestCycle({0, 18, 19, 20, 21}),
-      TestCycle({1, 15, 16, 17, 18}),
-      TestCycle({2, 3, 13, 14, 15}),
-      TestCycle({4, 5, 11, 12, 13}),
-      TestCycle({6, 7, 9, 10, 11}),
-      TestCycle({8, 9, 21, 22, 23}),
-      TestCycle({0, 1, 8, 9, 10, 12, 14, 15})
+      TestCycle({ 23, 9, 8, 21, 22 }),
+      TestCycle({ 20, 19, 18, 0, 21 }),
+      TestCycle({ 10, 9, 7, 6, 11 }),
+      TestCycle({ 17, 16, 15, 1, 18 }),
+      TestCycle({ 12, 11, 5, 4, 13 }),
+      TestCycle({ 14, 13, 3, 2, 15 }),
+      TestCycle({ 15, 1, 0, 8, 9, 10, 12, 14 }),
   }));
 }
 
@@ -507,17 +518,17 @@ TYPED_TEST(RelevantCyclesTest, BergerFig8b)
   // tests isCycleSetComplete
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
       "*12****3*4*1*56**47**38**2(*5)*876", {
-      TestCycle({0, 1, 2, 3, 4, 5, 6}),
-      TestCycle({4, 10, 11, 12, 13}),
-      TestCycle({4, 10, 13, 20, 21}),
-      TestCycle({5, 7, 8, 9, 10}),
-      TestCycle({5, 7, 10, 21, 22}),
-      TestCycle({6, 7, 16, 17, 18}),
-      TestCycle({6, 7, 16, 19, 22}),
-      TestCycle({8, 9, 21, 22}),
-      TestCycle({11, 12, 20, 21}),
-      TestCycle({14, 15, 19, 20}),
-      TestCycle({17, 18, 19, 22})
+      TestCycle({ 19, 17, 18, 22 }),
+      TestCycle({ 20, 14, 15, 19 }),
+      TestCycle({ 21, 11, 12, 20 }),
+      TestCycle({ 22, 8, 9, 21 }),
+      TestCycle({ 18, 7, 6, 16, 17 }),
+      TestCycle({ 21, 10, 4, 13, 20 }),
+      TestCycle({ 9, 8, 7, 5, 10 }),
+      TestCycle({ 12, 11, 10, 4, 13 }),
+      TestCycle({ 22, 7, 6, 16, 19 }),
+      TestCycle({ 22, 7, 5, 10, 21 }),
+      TestCycle({ 5, 4, 3, 2, 1, 0, 6 })
   }));
 }
 

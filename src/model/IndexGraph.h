@@ -82,7 +82,7 @@ namespace ocgl {
     template<typename VertexOrEdge>
     static VertexOrEdge null()
     {
-      return nullIndex();
+      return std::numeric_limits<Index>::max();
     }
   };
 

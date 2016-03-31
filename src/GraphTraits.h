@@ -40,11 +40,6 @@ namespace ocgl {
    */
   using EdgeIndex = Index;
 
-  constexpr Index nullIndex()
-  {
-    return std::numeric_limits<Index>::max();
-  }
-
   /**
    * @page graph_concept_page Graph Concept
    * @brief Graph Concept documentation.
@@ -136,6 +131,18 @@ namespace ocgl {
       return Graph::template null<VertexOrEdge>();
     }
   };
+
+  /**
+   * @brief A list (i.e. std::vector) of vertices.
+   */
+  template<typename Graph>
+  using VertexList = std::vector<typename GraphTraits<Graph>::Vertex>;
+
+  /**
+   * @brief A list (i.e. std::vector) of edges.
+   */
+  template<typename Graph>
+  using EdgeList = std::vector<typename GraphTraits<Graph>::Edge>;
 
   namespace impl {
 
