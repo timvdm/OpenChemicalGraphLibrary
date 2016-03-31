@@ -27,7 +27,7 @@ TYPED_TEST(CycleSpaceTest, CycleSpace1)
   auto e1 = ocgl::addEdge(g, v1, v2);
   auto e2 = ocgl::addEdge(g, v2, v0);
   auto e3 = ocgl::addEdge(g, v0, v3);
-  auto e4 = ocgl::addEdge(g, v3, v0);
+  auto e4 = ocgl::addEdge(g, v3, v1);
 
   ocgl::EdgeCycle<Graph> c1({e0, e1, e2});
   ocgl::EdgeCycle<Graph> c2({e0, e3, e4});

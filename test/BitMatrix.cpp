@@ -205,7 +205,7 @@ TEST(BitMatrixTest, Eliminate1)
 
 TEST(BitMatrixTest, Eliminate2)
 {
-  ocgl::BitMatrix m(4, 4, {
+  ocgl::BitMatrix m(3, 4, {
       1, 1, 1, 1,
       1, 1, 0, 0,
       0, 0, 1, 1 });
