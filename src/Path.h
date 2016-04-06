@@ -5,7 +5,7 @@
 
 /**
  * @file Path.h
- * @brief Path classes and functions.
+ * @brief Functions for working with vertex and edge paths.
  */
 
 namespace ocgl {
@@ -78,205 +78,102 @@ namespace ocgl {
     return true;
   }
 
-  // fwd declaration
-  template<typename Graph>
-  class EdgePath;
-
   /**
-   * @class VertexPath Path.h <ocgl/Path.h>
    * @brief Vertex path in a graph.
    */
   template<typename Graph>
-  class VertexPath : public VertexList<Graph>
-  {
-    public:
-      /**
-       * @brief Default constructor.
-       */
-      VertexPath() = default;
-
-      /**
-       * @brief Copy constructor.
-       */
-      VertexPath(const VertexPath<Graph> &other) = default;
-
-      /**
-       * @brief Move constructor.
-       */
-      VertexPath(VertexPath<Graph> &&other) = default;
-
-      /**
-       * @brief Copy assignment.
-       */
-      VertexPath<Graph>& operator=(const VertexPath<Graph> &other) = default;
-
-      /**
-       * @brief Move assignment.
-       */
-      VertexPath<Graph>& operator=(VertexPath<Graph> &&other) = default;
-
-      /**
-       * @brief Copy constructor for vertex list.
-       */
-      explicit VertexPath(const VertexList<Graph> &vertices)
-        : VertexList<Graph>(vertices)
-      {
-      }
-
-      /**
-       * @brief Move constructor for vertex list.
-       */
-      explicit VertexPath(VertexList<Graph> &&vertices)
-        : VertexList<Graph>(std::move(vertices))
-      {
-      }
-
-      /**
-       * @brief Constructor for vertex initializer list.
-       */
-      explicit VertexPath(std::initializer_list<typename
-          GraphTraits<Graph>::Vertex> vertices) : VertexList<Graph>(vertices)
-      {
-      }
-
-      /**
-       * @brief Get the corresponding edge path.
-       *
-       * The edge path is not cached (i.e. it is reconstructed each time this
-       * function is called).
-       *
-       * @param g The graph.
-       */
-      EdgePath<Graph> edges(const Graph &g) const
-      {
-        EdgePath<Graph> result;
-        result.reserve(this->size());
-
-        for (auto i = 1; i < this->size(); ++i)
-          result.push_back(getEdge(g, this->operator[](i - 1),
-                                      this->operator[](i)));
-        return result;
-      }
-  };
+  using VertexPath = VertexList<Graph>;
 
   /**
-   * @class EdgePath Path.h <ocgl/Path.h>
    * @brief Edge path in a graph.
    */
   template<typename Graph>
-  class EdgePath : public EdgeList<Graph>
+  using EdgePath = EdgeList<Graph>;
+
+  /**
+   * @brief Convert a vertex path to the corresponding edge path.
+   *
+   * @param g The graph.
+   * @param vertices The vertex path.
+   */
+  template<typename Graph>
+  EdgePath<Graph> vertexPathToEdgePath(const Graph &g,
+      const VertexPath<Graph> &vertices)
   {
-    public:
-      /**
-       * @brief Default constructor.
-       */
-      EdgePath() = default;
+    EdgePath<Graph> edges;
+    edges.reserve(vertices.size());
 
-      /**
-       * @brief Copy constructor.
-       */
-      EdgePath(const EdgePath<Graph> &other) = default;
+    for (auto i = 1; i < vertices.size(); ++i)
+      edges.push_back(getEdge(g, vertices[i - 1], vertices[i]));
 
-      /**
-       * @brief Move constructor.
-       */
-      EdgePath(EdgePath<Graph> &&other) = default;
+    return edges;
+  }
 
-      /**
-       * @brief Copy assignment.
-       */
-      EdgePath<Graph>& operator=(const EdgePath<Graph> &other) = default;
+  /**
+   * @brief Get the edge path source vertex.
+   *
+   * @param g The graph.
+   * @param edges The edge path.
+   */
+  template<typename Graph>
+  typename GraphTraits<Graph>::Vertex edgePathSource(const Graph &g,
+      const EdgePath<Graph> &edges)
+  {
+    if (edges.empty())
+      return nullVertex<Graph>();
 
-      /**
-       * @brief Move assignment.
-       */
-      EdgePath<Graph>& operator=(EdgePath<Graph> &&other) = default;
+    if (edges.size() == 1)
+      return getSource(g, edges.front());
 
-      /**
-       * @brief Copy constructor for edge list.
-       */
-      explicit EdgePath(const EdgeList<Graph> &edges)
-        : EdgeList<Graph>(edges)
-      {
-      }
+    return getOther(g, edges.front(),
+        commonVertex(g, edges.front(), edges[1]));
+  }
 
-      /**
-       * @brief Move constructor for edge list.
-       */
-      explicit EdgePath(EdgeList<Graph> &&edges)
-        : EdgeList<Graph>(std::move(edges))
-      {
-      }
+  /**
+   * @brief Get the edge path target vertex.
+   *
+   * @param g The graph.
+   * @param edges The edge path.
+   */
+  template<typename Graph>
+  typename GraphTraits<Graph>::Vertex edgePathTarget(const Graph &g,
+      const EdgePath<Graph> &edges)
+  {
+    if (edges.empty())
+      return nullVertex<Graph>();
 
-      /**
-       * @brief Constructor for edge initializer list.
-       */
-      explicit EdgePath(std::initializer_list<typename
-          GraphTraits<Graph>::Edge> edges) : EdgeList<Graph>(edges)
-      {
-      }
+    if (edges.size() == 1)
+      return getTarget(g, edges.front());
 
-      /**
-       * @brief Get the path source vertex.
-       *
-       * @param g The graph.
-       */
-      typename GraphTraits<Graph>::Vertex source(const Graph &g) const
-      {
-        if (this->empty())
-          return nullVertex<Graph>();
+    return getOther(g, edges.back(),
+        commonVertex(g, edges.back(), edges[edges.size() - 1]));
+  }
 
-        if (this->size() == 1)
-          return getSource(g, this->front());
+  /**
+   * @brief Convert an edge path to the corresponding vertex path.
+   *
+   * @param g The graph.
+   * @param edges The edge path.
+   */
+  template<typename Graph>
+  VertexPath<Graph> edgePathToVertexPath(const Graph &g, const EdgePath<Graph> &edges)
+  {
+    if (edges.empty())
+      return VertexPath<Graph>();
 
-        return getOther(g, this->front(),
-            commonVertex(g, this->front(), this->operator[](1)));
-      }
+    VertexPath<Graph> vertices;
+    vertices.reserve(edges.size() + 1);
 
-      /**
-       * @brief Get the path target vertex.
-       *
-       * @param g The graph.
-       */
-      typename GraphTraits<Graph>::Vertex target(const Graph &g) const
-      {
-        if (this->empty())
-          return nullVertex<Graph>();
+    vertices.push_back(edgePathSource(g, edges));
+    for (auto i = 1; i < edges.size(); ++i) {
+      auto e1 = edges[i - 1];
+      auto e2 = edges[i];
+      vertices.push_back(commonVertex(g, e1, e2));
+    }
+    vertices.push_back(edgePathTarget(g, edges));
 
-        if (this->size() == 1)
-          return getTarget(g, this->front());
-
-        return getOther(g, this->back(),
-            commonVertex(g, this->back(), this->operator[](this->size() - 1)));
-      }
-
-      /**
-       * @brief Get the corresponding vertex path.
-       *
-       * The vertex path is not cached (i.e. it is reconstructed each time this
-       * function is called).
-       *
-       * @param g The graph.
-       */
-      VertexPath<Graph> vertices(const Graph &g) const
-      {
-        if (this->empty())
-          return VertexPath<Graph>();
-
-        VertexPath<Graph> result;
-        result.reserve(this->size() + 1);
-
-        result.push_back(source(g));
-        for (auto i = 1; i < this->size(); ++i) {
-          auto e1 = this->operator[](i - 1);
-          auto e2 = this->operator[](i);
-          result.push_back(commonVertex(g, e1, e2));
-        }
-        result.push_back(target(g));
-
-        return result;
-      }
-  };
+    return vertices;
+  }
 
   /**
    * @brief A list of vertex paths.

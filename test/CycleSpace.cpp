@@ -35,23 +35,23 @@ TYPED_TEST(CycleSpaceTest, CycleSpace1)
 
   ocgl::CycleSpace<Graph> sp(g);
 
-  EXPECT_FALSE(sp.contains(c1));
-  EXPECT_FALSE(sp.contains(c2));
-  EXPECT_FALSE(sp.contains(c3));
+  EXPECT_FALSE(sp.containsEdgeCycle(c1));
+  EXPECT_FALSE(sp.containsEdgeCycle(c2));
+  EXPECT_FALSE(sp.containsEdgeCycle(c3));
   EXPECT_FALSE(sp.isBasis());
 
-  sp.add(c1);
+  sp.addEdgeCycle(c1);
 
-  EXPECT_TRUE(sp.contains(c1));
-  EXPECT_FALSE(sp.contains(c2));
-  EXPECT_FALSE(sp.contains(c3));
+  EXPECT_TRUE(sp.containsEdgeCycle(c1));
+  EXPECT_FALSE(sp.containsEdgeCycle(c2));
+  EXPECT_FALSE(sp.containsEdgeCycle(c3));
   EXPECT_FALSE(sp.isBasis());
 
-  sp.add(c2);
+  sp.addEdgeCycle(c2);
 
-  EXPECT_TRUE(sp.contains(c1));
-  EXPECT_TRUE(sp.contains(c2));
-  EXPECT_TRUE(sp.contains(c3));
+  EXPECT_TRUE(sp.containsEdgeCycle(c1));
+  EXPECT_TRUE(sp.containsEdgeCycle(c2));
+  EXPECT_TRUE(sp.containsEdgeCycle(c3));
   EXPECT_TRUE(sp.isBasis());
 
 }

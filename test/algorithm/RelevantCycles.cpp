@@ -31,7 +31,7 @@ bool isSameCycle(const Graph &g, const TestCycle &testCycle,
     return false;
 
   std::vector<ocgl::EdgeIndex> edges;
-  for (auto e : cycle.edges(g))
+  for (auto e : ocgl::vertexCycleToEdgeCycle(g, cycle))
     edges.push_back(ocgl::getEdgeIndex(g, e));
 
   auto it = std::find(edges.begin(), edges.end(), testCycle.edges.front());
@@ -68,7 +68,7 @@ bool testRelevantCycles(const std::string &str, std::initializer_list<TestCycle>
   std::cout << "relevant cycles:" << std::endl;
   for (auto &cycle : cycles) {
     std::cout << "    Cycle [ ";
-    for (auto e : cycle.edges(g))
+    for (auto e : ocgl::vertexCycleToEdgeCycle(g, cycle))
       std::cout << ocgl::getEdgeIndex(g, e) << " ";
     std::cout << "]" << std::endl;
   }

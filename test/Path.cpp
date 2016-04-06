@@ -229,17 +229,17 @@ TYPED_TEST(PathTest, VertexPathToEdgePath)
 
   // from empty vertex path
   ocgl::VertexPath<Graph> vertices1;
-  ocgl::EdgePath<Graph> edges1 = vertices1.edges(g);
+  ocgl::EdgePath<Graph> edges1 = ocgl::vertexPathToEdgePath(g, vertices1);
   EXPECT_EQ(0, edges1.size());
 
   // from single vertex path
   ocgl::VertexPath<Graph> vertices2{v0};
-  ocgl::EdgePath<Graph> edges2 = vertices2.edges(g);
+  ocgl::EdgePath<Graph> edges2 = ocgl::vertexPathToEdgePath(g, vertices2);
   EXPECT_EQ(0, edges2.size());
 
   // from 4 vertices
   ocgl::VertexPath<Graph> vertices3{v0, v1, v2, v3};
-  ocgl::EdgePath<Graph> edges3 = vertices3.edges(g);
+  ocgl::EdgePath<Graph> edges3 = ocgl::vertexPathToEdgePath(g, vertices3);
   ASSERT_EQ(3, edges3.size());
   EXPECT_EQ(e0, edges3[0]);
   EXPECT_EQ(e1, edges3[1]);
@@ -310,19 +310,19 @@ TYPED_TEST(PathTest, EdgePathToVertexPath)
 
   // from empty edge path
   ocgl::EdgePath<Graph> edges1;
-  ocgl::VertexPath<Graph> vertices1 = edges1.vertices(g);
+  ocgl::VertexPath<Graph> vertices1 = ocgl::edgePathToVertexPath(g, edges1);
   EXPECT_EQ(0, vertices1.size());
 
   // from single edge path
   ocgl::EdgePath<Graph> edges2{e1};
-  ocgl::VertexPath<Graph> vertices2 = edges2.vertices(g);
+  ocgl::VertexPath<Graph> vertices2 = ocgl::edgePathToVertexPath(g, edges2);
   ASSERT_EQ(2, vertices2.size());
   EXPECT_EQ(v1, vertices2[0]);
   EXPECT_EQ(v2, vertices2[1]);
 
   // from 3 edges
   ocgl::EdgePath<Graph> edges3{e0, e1, e2};
-  ocgl::VertexPath<Graph> vertices3 = edges3.vertices(g);
+  ocgl::VertexPath<Graph> vertices3 = ocgl::edgePathToVertexPath(g, edges3);
   ASSERT_EQ(4, vertices3.size());
   EXPECT_EQ(v0, vertices3[0]);
   EXPECT_EQ(v1, vertices3[1]);
@@ -346,23 +346,23 @@ TYPED_TEST(PathTest, EdgePathSourceTarget)
 
   // from empty edge path
   ocgl::EdgePath<Graph> edges1;
-  EXPECT_EQ(ocgl::nullVertex<Graph>(), edges1.source(g));
-  EXPECT_EQ(ocgl::nullVertex<Graph>(), edges1.target(g));
+  EXPECT_EQ(ocgl::nullVertex<Graph>(), ocgl::edgePathSource(g, edges1));
+  EXPECT_EQ(ocgl::nullVertex<Graph>(), ocgl::edgePathTarget(g, edges1));
 
   // from single edge path
   ocgl::EdgePath<Graph> edges2{e1};
-  EXPECT_EQ(v1, edges2.source(g));
-  EXPECT_EQ(v2, edges2.target(g));
+  EXPECT_EQ(v1, ocgl::edgePathSource(g, edges2));
+  EXPECT_EQ(v2, ocgl::edgePathTarget(g, edges2));
 
   // from [ e0 e1 e2 ]
   ocgl::EdgePath<Graph> edges3{e0, e1, e2};
-  EXPECT_EQ(v0, edges3.source(g));
-  EXPECT_EQ(v3, edges3.target(g));
+  EXPECT_EQ(v0, ocgl::edgePathSource(g, edges3));
+  EXPECT_EQ(v3, ocgl::edgePathTarget(g, edges3));
 
   // from [ e2 e1 e0 ]
   ocgl::EdgePath<Graph> edges4{e2, e1, e0};
-  EXPECT_EQ(v3, edges4.source(g));
-  EXPECT_EQ(v0, edges4.target(g));
+  EXPECT_EQ(v3, ocgl::edgePathSource(g, edges4));
+  EXPECT_EQ(v0, ocgl::edgePathTarget(g, edges4));
 }
 
 

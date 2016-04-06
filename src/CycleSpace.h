@@ -55,7 +55,7 @@ namespace ocgl {
        *
        * @param cycle The edge cycle to add.
        */
-      void add(const EdgeCycle<Graph> &cycle, bool update = true)
+      void addEdgeCycle(const EdgeCycle<Graph> &cycle, bool update = true)
       {
         // get the index for the new row
         int row = m_B.rows();
@@ -76,9 +76,9 @@ namespace ocgl {
        *
        * @param cycle The vertex cycle to add.
        */
-      void add(const VertexCycle<Graph> &cycle, bool update = true)
+      void addVertexCycle(const VertexCycle<Graph> &cycle, bool update = true)
       {
-        add(cycle.edges(m_graph), update);
+        addEdgeCycle(vertexCycleToEdgeCycle(m_graph, cycle), update);
       }
 
       /**
@@ -86,7 +86,7 @@ namespace ocgl {
        *
        * @param cycle The edge cycle to check.
        */
-      bool contains(const EdgeCycle<Graph> &cycle) const
+      bool containsEdgeCycle(const EdgeCycle<Graph> &cycle) const
       {
         for (auto e : cycle)
           if (!m_cyclicEdges[getEdgeIndex(m_graph, e)])
@@ -113,9 +113,9 @@ namespace ocgl {
        *
        * @param cycle The vertex cycle to check.
        */
-      bool contains(const VertexCycle<Graph> &cycle) const
+      bool containsVertexCycle(const VertexCycle<Graph> &cycle) const
       {
-        return contains(cycle.edges(m_graph));
+        return containsEdgeCycle(vertexCycleToEdgeCycle(m_graph, cycle));
       }
 
       /**

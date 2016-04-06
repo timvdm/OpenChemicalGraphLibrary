@@ -71,22 +71,22 @@ TYPED_TEST(CycleTest, VertexCycleToEdgeCycle)
 
   // from 0 vertices
   ocgl::VertexCycle<Graph> vertices1;
-  ocgl::EdgeCycle<Graph> edges1 = vertices1.edges(g);
+  ocgl::EdgeCycle<Graph> edges1 = ocgl::vertexCycleToEdgeCycle(g, vertices1);
   EXPECT_EQ(0, edges1.size());
 
   // from 1 vertices
   ocgl::VertexCycle<Graph> vertices2{v0};
-  ocgl::EdgeCycle<Graph> edges2 = vertices2.edges(g);
+  ocgl::EdgeCycle<Graph> edges2 = ocgl::vertexCycleToEdgeCycle(g, vertices2);
   EXPECT_EQ(0, edges2.size());
 
   // from 2 vertices
   ocgl::VertexCycle<Graph> vertices3{v0, v1};
-  ocgl::EdgeCycle<Graph> edges3 = vertices3.edges(g);
+  ocgl::EdgeCycle<Graph> edges3 = ocgl::vertexCycleToEdgeCycle(g, vertices3);
   EXPECT_EQ(0, edges3.size());
 
   // from 3 vertices : [ v0 v1 v2 ]
   ocgl::VertexCycle<Graph> vertices4{v0, v1, v2};
-  ocgl::EdgeCycle<Graph> edges4 = vertices4.edges(g);
+  ocgl::EdgeCycle<Graph> edges4 = ocgl::vertexCycleToEdgeCycle(g, vertices4);
   ASSERT_EQ(3, edges4.size());
   EXPECT_EQ(e0, edges4[0]);
   EXPECT_EQ(e1, edges4[1]);
@@ -94,7 +94,7 @@ TYPED_TEST(CycleTest, VertexCycleToEdgeCycle)
 
   // from 3 vertices : [ v2 v0 v1 ]
   ocgl::VertexCycle<Graph> vertices5{v2, v0, v1};
-  ocgl::EdgeCycle<Graph> edges5 = vertices5.edges(g);
+  ocgl::EdgeCycle<Graph> edges5 = ocgl::vertexCycleToEdgeCycle(g, vertices5);
   ASSERT_EQ(3, edges5.size());
   EXPECT_EQ(e2, edges5[0]);
   EXPECT_EQ(e0, edges5[1]);
@@ -169,22 +169,22 @@ TYPED_TEST(CycleTest, EdgeCycleToVertexCycle)
 
   // from 0 edges
   ocgl::EdgeCycle<Graph> edges1;
-  ocgl::VertexCycle<Graph> vertices1 = edges1.vertices(g);
+  ocgl::VertexCycle<Graph> vertices1 = ocgl::edgeCycleToVertexCycle(g, edges1);
   EXPECT_EQ(0, vertices1.size());
 
   // from 1 edge
   ocgl::EdgeCycle<Graph> edges2{e0};
-  ocgl::VertexCycle<Graph> vertices2 = edges2.vertices(g);
+  ocgl::VertexCycle<Graph> vertices2 = ocgl::edgeCycleToVertexCycle(g, edges2);
   EXPECT_EQ(0, vertices2.size());
 
   // from 2 edges
   ocgl::EdgeCycle<Graph> edges3{e0, e1};
-  ocgl::VertexCycle<Graph> vertices3 = edges3.vertices(g);
+  ocgl::VertexCycle<Graph> vertices3 = ocgl::edgeCycleToVertexCycle(g, edges3);
   EXPECT_EQ(0, vertices3.size());
 
   // from 3 edges : [ e0 e1 e2 ]
   ocgl::EdgeCycle<Graph> edges4{e0, e1, e2};
-  ocgl::VertexCycle<Graph> vertices4 = edges4.vertices(g);
+  ocgl::VertexCycle<Graph> vertices4 = ocgl::edgeCycleToVertexCycle(g, edges4);
   ASSERT_EQ(3, vertices4.size());
   EXPECT_EQ(v0, vertices4[0]);
   EXPECT_EQ(v1, vertices4[1]);
@@ -192,7 +192,7 @@ TYPED_TEST(CycleTest, EdgeCycleToVertexCycle)
 
   // from 3 edges : [ e1 e0 e2 ]
   ocgl::EdgeCycle<Graph> edges5{e1, e0, e2};
-  ocgl::VertexCycle<Graph> vertices5 = edges5.vertices(g);
+  ocgl::VertexCycle<Graph> vertices5 = ocgl::edgeCycleToVertexCycle(g, edges5);
   ASSERT_EQ(3, vertices5.size());
   EXPECT_EQ(v2, vertices5[0]);
   EXPECT_EQ(v1, vertices5[1]);

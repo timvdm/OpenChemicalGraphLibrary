@@ -6,183 +6,76 @@
 
 /**
  * @file Cycle.h
- * @brief Cycle classes and functions.
+ * @brief Functions for working with vertex and edge cycles.
  */
 
 namespace ocgl {
 
-  // fwd declaration
-  template<typename Graph>
-  class EdgeCycle;
-
   /**
-   * @class VertexCycle Cycle.h <ocgl/Cycle.h>
    * @brief Vertex cycle in a graph.
    */
   template<typename Graph>
-  class VertexCycle : public VertexPath<Graph>
-  {
-    public:
-      /**
-       * @brief Default constructor.
-       */
-      VertexCycle() = default;
-
-      /**
-       * @brief Copy constructor.
-       */
-      VertexCycle(const VertexCycle<Graph> &other) = default;
-
-      /**
-       * @brief Move constructor.
-       */
-      VertexCycle(VertexCycle<Graph> &&other) = default;
-
-      /**
-       * @brief Copy assignment.
-       */
-      VertexCycle<Graph>& operator=(const VertexCycle<Graph> &other) = default;
-
-      /**
-       * @brief Move assignment.
-       */
-      VertexCycle<Graph>& operator=(VertexCycle<Graph> &&other) = default;
-
-      /**
-       * @brief Copy constructor for vertex list.
-       */
-      explicit VertexCycle(const VertexList<Graph> &vertices)
-        : VertexPath<Graph>(vertices)
-      {
-      }
-
-      /**
-       * @brief Move constructor for vertex list.
-       */
-      explicit VertexCycle(VertexList<Graph> &&vertices)
-        : VertexPath<Graph>(std::move(vertices))
-      {
-      }
-
-      /**
-       * @brief Constructor for vertex initializer list.
-       */
-      explicit VertexCycle(std::initializer_list<typename
-          GraphTraits<Graph>::Vertex> vertices) : VertexPath<Graph>(vertices)
-      {
-      }
-
-      /**
-       * @brief Get the corresponding edge cycle.
-       *
-       * The edge cycle is not cached (i.e. it is reconstructed each time this
-       * function is called).
-       *
-       * @param g The graph.
-       */
-      EdgeCycle<Graph> edges(const Graph &g) const
-      {
-        if (this->size() < 3)
-         return EdgeCycle<Graph>();
-
-        EdgeCycle<Graph> result;
-        result.reserve(this->size());
-
-        for (auto i = 1; i < this->size(); ++i) {
-          auto v1 = this->operator[](i - 1);
-          auto v2 = this->operator[](i);
-          result.push_back(getEdge(g, v1, v2));
-        }
-
-        result.push_back(getEdge(g, this->front(), this->back()));
-
-        return result;
-      }
-  };
+  using VertexCycle = VertexList<Graph>;
 
   /**
-   * @class EdgeCycle Cycle.h <ocgl/Cycle.h>
    * @brief Edge cycle in a graph.
    */
   template<typename Graph>
-  class EdgeCycle : public EdgePath<Graph>
+  using EdgeCycle = EdgeList<Graph>;
+
+  /**
+   * @brief Convert a vertex cycle to the corresponding edge cycle.
+   *
+   * @param g The graph.
+   * @param vertices The vertex cycle.
+   */
+  template<typename Graph>
+  EdgeCycle<Graph> vertexCycleToEdgeCycle(const Graph &g,
+      const VertexCycle<Graph> &vertices)
   {
-    public:
-      /**
-       * @brief Default constructor.
-       */
-      EdgeCycle() = default;
+    if (vertices.size() < 3)
+      return EdgeCycle<Graph>();
 
-      /**
-       * @brief Copy constructor.
-       */
-      EdgeCycle(const EdgeCycle<Graph> &other) = default;
+    EdgeCycle<Graph> edges;
+    edges.reserve(vertices.size());
 
-      /**
-       * @brief Move constructor.
-       */
-      EdgeCycle(EdgeCycle<Graph> &&other) = default;
+    for (auto i = 1; i < vertices.size(); ++i) {
+      auto v1 = vertices[i - 1];
+      auto v2 = vertices[i];
+      edges.push_back(getEdge(g, v1, v2));
+    }
 
-      /**
-       * @brief Copy assignment.
-       */
-      EdgeCycle<Graph>& operator=(const EdgeCycle<Graph> &other) = default;
+    edges.push_back(getEdge(g, vertices.front(), vertices.back()));
 
-      /**
-       * @brief Move assignment.
-       */
-      EdgeCycle<Graph>& operator=(EdgeCycle<Graph> &&other) = default;
+    return edges;
+  }
 
-      /**
-       * @brief Copy constructor for edge list.
-       */
-      explicit EdgeCycle(const EdgeList<Graph> &edges)
-        : EdgePath<Graph>(edges)
-      {
-      }
 
-      /**
-       * @brief Move constructor for edge list.
-       */
-      explicit EdgeCycle(EdgeList<Graph> &&edges)
-        : EdgePath<Graph>(std::move(edges))
-      {
-      }
+  /**
+   * @brief Convert an edge cycle to the corresponding vertex cycle.
+   *
+   * @param g The graph.
+   * @param edges The edge cycle.
+   */
+  template<typename Graph>
+  VertexCycle<Graph> edgeCycleToVertexCycle(const Graph &g,
+      const EdgeCycle<Graph> &edges)
+  {
+    if (edges.size() < 3)
+      return VertexCycle<Graph>();
 
-      /**
-       * @brief Constructor for edge initializer list.
-       */
-      explicit EdgeCycle(std::initializer_list<typename
-          GraphTraits<Graph>::Edge> edges) : EdgePath<Graph>(edges)
-      {
-      }
+    VertexCycle<Graph> vertices;
+    vertices.reserve(edges.size());
 
-      /**
-       * @brief Get the corresponding vertex cycle.
-       *
-       * The vertex cycle is not cached (i.e. it is reconstructed each time this
-       * function is called).
-       *
-       * @param g The graph.
-       */
-      VertexCycle<Graph> vertices(const Graph &g) const
-      {
-        if (this->size() < 3)
-          return VertexCycle<Graph>();
+    vertices.push_back(edgePathSource(g, edges));
+    for (auto i = 1; i < edges.size(); ++i) {
+      auto e1 = edges[i - 1];
+      auto e2 = edges[i];
+      vertices.push_back(commonVertex(g, e1, e2));
+    }
 
-        VertexCycle<Graph> result;
-        result.reserve(this->size());
-
-        result.push_back(this->source(g));
-        for (auto i = 1; i < this->size(); ++i) {
-          auto e1 = this->operator[](i - 1);
-          auto e2 = this->operator[](i);
-          result.push_back(commonVertex(g, e1, e2));
-        }
-
-        return result;
-      }
-  };
+    return vertices;
+  }
 
   /**
    * @brief A list of vertex cycles.

@@ -465,7 +465,7 @@ namespace ocgl {
           if (lastSize < family.prototype().size()) {
             // add newly added relevant family prototypes to cycleSpace
             for (auto j : add)
-              cycleSpace.add(families[j].prototype(), false);
+              cycleSpace.addVertexCycle(families[j].prototype(), false);
             cycleSpace.updateMatrix();
             add.clear();
 
@@ -483,7 +483,7 @@ namespace ocgl {
             lastSize = family.prototype().size();
           }
 
-          if (cycleSpace.contains(family.prototype()))
+          if (cycleSpace.containsVertexCycle(family.prototype()))
             remove.push_back(i);
           else
             add.push_back(i);
@@ -672,15 +672,7 @@ namespace ocgl {
             cycleMembership(subg));
             //cycleMember);
 
-        for (auto &subgraphCycle : subgraphCycles) {
-          VertexCycle<Graph> cycle;
-          cycle.reserve(subgraphCycle.size());
-          for (auto v : subgraphCycle)
-            cycle.push_back(v);
-          result.push_back(cycle);
-        }
-
-        //std::copy(subgraphCycles.begin(), subgraphCycles.end(), std::back_inserter(result));
+        std::copy(subgraphCycles.begin(), subgraphCycles.end(), std::back_inserter(result));
       }
 
       return result;
