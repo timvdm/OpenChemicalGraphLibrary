@@ -494,6 +494,7 @@ namespace ocgl {
           families.erase(families.begin() + remove[remove.size() - i - 1]);
       }
 
+      /*
       template<typename Graph>
       void selectRelevantCycleFamiliesSubrange(const std::vector<CycleFamily<Graph>> &families,
           std::size_t begin, std::size_t end, CycleSpace<Graph> &cycleSpace,
@@ -588,6 +589,7 @@ namespace ocgl {
           if (remove[remove.size() - i - 1])
             families.erase(families.begin() + remove.size() - i - 1);
       }
+    */
 
     } // namespace impl
 
@@ -641,6 +643,19 @@ namespace ocgl {
           cycleMember);
     }
 
+    /**
+     * @brief Find the relevant cycles.
+     *
+     * The set of relevant cycles is formed by taking the union of all the
+     * minimum cycles bases. An alternative definition is that a cycle is
+     * relevant if it is not the sum of smaller cycles.
+     *
+     * This function considers each cyclic component individually.
+     *
+     * @param g The graph.
+     *
+     * @return The set of relevant cycles.
+     */
     template<typename Graph>
     VertexCycleList<Graph> relevantCyclesSubgraphs(const Graph &g)
     {
@@ -652,14 +667,6 @@ namespace ocgl {
 
       VertexCycleList<Graph> result;
       for (auto &subg : cycleSubgraphs) {
-
-        if (numVertices(subg) == 5 && numEdges(subg) == 5)
-          continue;
-        if (numVertices(subg) == 6 && numEdges(subg) == 6)
-          continue;
-        if (numVertices(subg) == 9 && numEdges(subg) == 10)
-          continue;
-
 
         auto subgraphCycles = relevantCyclesVismara(subg, circuitRank(subg, 1),
             cycleMembership(subg));

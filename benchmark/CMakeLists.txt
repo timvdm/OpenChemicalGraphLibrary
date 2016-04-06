@@ -1,2 +1,2 @@
 add_executable(RelevantCyclesBenchmark RelevantCycles.cpp)
-target_link_libraries(RelevantCyclesBenchmark benchmark)
+target_link_libraries(RelevantCyclesBenchmark ${CMAKE_THREAD_LIBS_INIT} benchmark)

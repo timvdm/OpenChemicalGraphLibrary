@@ -26,7 +26,6 @@
   } \
   BENCHMARK_TEMPLATE(function##_##name, ocgl::model::IndexGraph);
 
-/*
 RELEVANT_CYCLES_BENCHMARK(relevantCycles, nanotube_6n_6m_20A);
 RELEVANT_CYCLES_BENCHMARK(relevantCycles, nanotube_6n_6m_40A);
 RELEVANT_CYCLES_BENCHMARK(relevantCycles, nanotube_6n_6m_60A);
@@ -36,7 +35,6 @@ RELEVANT_CYCLES_BENCHMARK(relevantCycles, nanotube_9n_9m_20A);
 RELEVANT_CYCLES_BENCHMARK(relevantCycles, nanotube_9n_9m_40A);
 RELEVANT_CYCLES_BENCHMARK(relevantCycles, nanotube_9n_9m_60A);
 RELEVANT_CYCLES_BENCHMARK(relevantCycles, nanotube_9n_9m_80A);
-*/
 
 RELEVANT_CYCLES_BENCHMARK(relevantCycles, pdb_2r4s);
 RELEVANT_CYCLES_BENCHMARK(relevantCyclesSubgraphs, pdb_2r4s);
