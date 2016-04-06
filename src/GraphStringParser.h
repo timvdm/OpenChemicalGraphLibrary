@@ -56,9 +56,11 @@ namespace ocgl {
 
       Graph g;
       std::vector<Vertex> prev(1, nullVertex<Graph>());
-      std::map<char, Vertex> backEdges;
+      std::map<int, Vertex> backEdges;
 
-      for (auto c : str) {
+      for (auto i = 0; i < str.size(); ++i) {
+        auto c = str[i];
+
         switch (c) {
           case '*':
             {
@@ -88,6 +90,7 @@ namespace ocgl {
             prev.clear();
             prev.resize(1, nullVertex<Graph>());
             break;
+          case '%':
           case '0':
           case '1':
           case '2':
@@ -101,11 +104,20 @@ namespace ocgl {
             {
               // handle back edge
               if (isNull(g, prev.back()))
-                throw std::runtime_error("Back edge digit can only be placed after vertex");
+                throw std::runtime_error("Back edge number can only be placed after vertex");
 
-              auto it = backEdges.find(c);
+              int n = c - '0';
+              if (c == '%') {
+                if (!std::isdigit(str[i + 1]) || !std::isdigit(str[i + 2]))
+                  throw std::runtime_error("Expected two digits after back edge number specifier '%'");
+
+                n = 10 * (str[i + 1] - '0') + str[i + 2] - '0';
+                i += 2;
+              }
+
+              auto it = backEdges.find(n);
               if (it == backEdges.end()) {
-                backEdges[c] = prev.back();
+                backEdges[n] = prev.back();
               } else {
                 // add edge
                 addEdge(g, it->second, prev.back());

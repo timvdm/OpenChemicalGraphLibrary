@@ -64,6 +64,32 @@ TYPED_TEST(GraphStringParserTest, TwoBackEdges)
   EXPECT_TRUE(ocgl::isConnected(g, V[5], V[3]));
 }
 
+TYPED_TEST(GraphStringParserTest, TwoDigitBackEdge1)
+{
+  auto g = ocgl::GraphStringParser<TypeParam>::parse("*%42**%42");
+  EXPECT_EQ(3, ocgl::numVertices(g));
+  EXPECT_EQ(3, ocgl::numEdges(g));
+
+  auto V = ocgl::getVertices(g).toVector();
+
+  EXPECT_TRUE(ocgl::isConnected(g, V[0], V[1]));
+  EXPECT_TRUE(ocgl::isConnected(g, V[1], V[2]));
+  EXPECT_TRUE(ocgl::isConnected(g, V[0], V[2]));
+}
+
+TYPED_TEST(GraphStringParserTest, TwoDigitBackEdge2)
+{
+  auto g = ocgl::GraphStringParser<TypeParam>::parse("*5**%05");
+  EXPECT_EQ(3, ocgl::numVertices(g));
+  EXPECT_EQ(3, ocgl::numEdges(g));
+
+  auto V = ocgl::getVertices(g).toVector();
+
+  EXPECT_TRUE(ocgl::isConnected(g, V[0], V[1]));
+  EXPECT_TRUE(ocgl::isConnected(g, V[1], V[2]));
+  EXPECT_TRUE(ocgl::isConnected(g, V[0], V[2]));
+}
+
 TYPED_TEST(GraphStringParserTest, Components)
 {
   auto g = ocgl::GraphStringParser<TypeParam>::parse("**.**.*");

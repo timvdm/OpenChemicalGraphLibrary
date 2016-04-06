@@ -410,7 +410,6 @@ TYPED_TEST(RelevantCyclesTest, BergerFig4a)
   }));
 }
 
-/*
 TYPED_TEST(RelevantCyclesTest, BergerFig4b)
 {
   EXPECT_TRUE(testRelevantCycles<TypeParam>(
@@ -431,7 +430,6 @@ TYPED_TEST(RelevantCyclesTest, BergerFig4b)
       TestCycle({8, 24, 25})
   }));
 }
-*/
 
 TYPED_TEST(RelevantCyclesTest, BergerFig5a)
 {
