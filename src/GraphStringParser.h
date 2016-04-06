@@ -65,7 +65,7 @@ namespace ocgl {
               // add new vertex
               auto v = addVertex(g);
               // add edge to previous (if needed)
-              if (isValid(g, prev.back()))
+              if (isValidVertex(g, prev.back()))
                 addEdge(g, prev.back(), v);
               // set this vertex as previous
               prev.back() = v;
@@ -100,7 +100,7 @@ namespace ocgl {
           case '9':
             {
               // handle back edge
-              if (isNull(g, prev.back()))
+              if (isNullVertex(g, prev.back()))
                 throw std::runtime_error("Back edge digit can only be placed after vertex");
 
               auto it = backEdges.find(c);

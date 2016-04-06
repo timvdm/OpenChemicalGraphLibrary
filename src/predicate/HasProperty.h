@@ -49,15 +49,29 @@ namespace ocgl {
         }
 
         /**
-         * @brief The call operator itself.
+         * @brief The call operator for vertices.
          *
          * @param g The graph.
-         * @param x The vertex or edge.
+         * @param v The vertex.
          */
-        template<typename VertexOrEdge>
-        bool operator()(const Graph &g, VertexOrEdge x) const
+        template<typename Tag = VertexOrEdgeTag>
+        typename std::enable_if<std::is_same<Tag, impl::VertexTag>::value, bool>::type
+        operator()(const Graph &g, typename GraphTraits<Graph>::Vertex v) const
         {
-          return m_compare(m_properties[x], m_value);
+          return m_compare(m_properties[v], m_value);
+        }
+
+        /**
+         * @brief The call operator edges.
+         *
+         * @param g The graph.
+         * @param e The edge.
+         */
+        template<typename Tag = VertexOrEdgeTag>
+        typename std::enable_if<std::is_same<Tag, impl::EdgeTag>::value, bool>::type
+        operator()(const Graph &g, typename GraphTraits<Graph>::Edge e) const
+        {
+          return m_compare(m_properties[e], m_value);
         }
 
       private:

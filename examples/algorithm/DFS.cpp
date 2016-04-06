@@ -11,7 +11,7 @@ struct MyDFSVisitor : public ocgl::algorithm::DFSVisitor<Graph>
 {
   void vertex(const Graph &g, Vertex v)
   {
-    std::cout << "vertex with index " << ocgl::getIndex(g, v) << std::endl;
+    std::cout << "vertex with index " << ocgl::getVertexIndex(g, v) << std::endl;
   }
 };
 

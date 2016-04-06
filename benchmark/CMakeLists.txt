@@ -1,0 +1,2 @@
+add_executable(RelevantCyclesBenchmark RelevantCycles.cpp)
+target_link_libraries(RelevantCyclesBenchmark benchmark)

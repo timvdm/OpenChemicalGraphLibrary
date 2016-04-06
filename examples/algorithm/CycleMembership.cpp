@@ -27,27 +27,27 @@ int main(int argc, char **argv)
   std::cout << "acylic vertex indices: ";
   for (auto v : ocgl::getVertices(g))
     if (!isCyclic.vertices[v])
-      std::cout << ocgl::getIndex(g, v) << " ";
+      std::cout << ocgl::getVertexIndex(g, v) << " ";
   std::cout << std::endl;
 
   // print acylic edges
   std::cout << "acylic edge indices  : ";
   for (auto e : ocgl::getEdges(g))
     if (!isCyclic.edges[e])
-      std::cout << ocgl::getIndex(g, e) << " ";
+      std::cout << ocgl::getEdgeIndex(g, e) << " ";
   std::cout << std::endl;
 
   // print cylic vertices
   std::cout << "cylic vertex indices : ";
   for (auto v : ocgl::getVertices(g))
     if (isCyclic.vertices[v])
-      std::cout << ocgl::getIndex(g, v) << " ";
+      std::cout << ocgl::getVertexIndex(g, v) << " ";
   std::cout << std::endl;
 
   // print cylic vertices
   std::cout << "cylic edge indices   : ";
   for (auto e : ocgl::getEdges(g))
     if (isCyclic.edges[e])
-      std::cout << ocgl::getIndex(g, e) << " ";
+      std::cout << ocgl::getEdgeIndex(g, e) << " ";
   std::cout << std::endl;
 }

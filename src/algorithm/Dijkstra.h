@@ -144,7 +144,7 @@ namespace ocgl {
           Vertex u = target;
 
           // reconstruct the path
-          while (isValid(m_graph, m_prev[u])) {
+          while (isValidVertex(m_graph, m_prev[u])) {
             S.insert(S.begin(), u);
             u = m_prev[u];
           }
@@ -169,7 +169,7 @@ namespace ocgl {
           Vertex u = target;
 
           // reconstruct the path
-          while (isValid(m_graph, m_prev[u])) {
+          while (isValidVertex(m_graph, m_prev[u])) {
             S.push_back(u);
             u = m_prev[u];
           }

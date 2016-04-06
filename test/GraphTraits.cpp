@@ -11,8 +11,12 @@ struct IdGraph
   using IncidentIter = float;
   using AdjacentIter = double;
 
-  template<typename VertexOrEdge>
-  static VertexOrEdge null()
+  static Vertex nullVertex()
+  {
+    return -1;
+  }
+
+  static Edge nullEdge()
   {
     return -1;
   }
@@ -30,16 +34,20 @@ TEST(GraphTraitsTest, IdGraph)
   EXPECT_TRUE((std::is_same<Graph::IncidentIter, ocgl::GraphTraits<Graph>::IncidentIter>::value));
   EXPECT_TRUE((std::is_same<Graph::AdjacentIter, ocgl::GraphTraits<Graph>::AdjacentIter>::value));
 
-  // test GraphTraits::null()
-  EXPECT_EQ(-1, ocgl::GraphTraits<Graph>::null<ocgl::GraphTraits<Graph>::Vertex>());
-  EXPECT_EQ(-1, ocgl::GraphTraits<Graph>::null<ocgl::GraphTraits<Graph>::Edge>());
+  // test null
+  EXPECT_EQ(-1, ocgl::GraphTraits<Graph>::nullVertex());
+  EXPECT_EQ(-1, ocgl::GraphTraits<Graph>::nullEdge());
 
   // check isNull/isValid
   Graph g;
-  EXPECT_TRUE(ocgl::isNull(g, -1));
-  EXPECT_FALSE(ocgl::isNull(g, 0));
-  EXPECT_FALSE(ocgl::isValid(g, -1));
-  EXPECT_TRUE(ocgl::isValid(g, 0));
+  EXPECT_TRUE(ocgl::isNullVertex(g, -1));
+  EXPECT_TRUE(ocgl::isNullEdge(g, -1));
+  EXPECT_FALSE(ocgl::isNullVertex(g, 0));
+  EXPECT_FALSE(ocgl::isNullEdge(g, 0));
+  EXPECT_FALSE(ocgl::isValidVertex(g, -1));
+  EXPECT_FALSE(ocgl::isValidEdge(g, -1));
+  EXPECT_TRUE(ocgl::isValidVertex(g, 0));
+  EXPECT_TRUE(ocgl::isValidEdge(g, 0));
 }
 
 struct PointerVertex {};
@@ -54,8 +62,12 @@ struct PointerGraph
   using IncidentIter = float;
   using AdjacentIter = double;
 
-  template<typename VertexOrEdge>
-  static VertexOrEdge null()
+  static Vertex nullVertex()
+  {
+    return nullptr;
+  }
+
+  static Edge nullEdge()
   {
     return nullptr;
   }
@@ -75,18 +87,20 @@ TEST(GraphTraitsTest, PointerGraph)
   EXPECT_TRUE((std::is_same<Graph::IncidentIter, ocgl::GraphTraits<Graph>::IncidentIter>::value));
   EXPECT_TRUE((std::is_same<Graph::AdjacentIter, ocgl::GraphTraits<Graph>::AdjacentIter>::value));
 
-  // test null()
-  EXPECT_EQ(nullptr, ocgl::GraphTraits<Graph>::null<ocgl::GraphTraits<Graph>::Vertex>());
-  EXPECT_EQ(nullptr, ocgl::GraphTraits<Graph>::null<ocgl::GraphTraits<Graph>::Edge>());
+  // test null
+  EXPECT_EQ(nullptr, ocgl::GraphTraits<Graph>::nullVertex());
+  EXPECT_EQ(nullptr, ocgl::GraphTraits<Graph>::nullEdge());
 
   // check isNull/isValid
   Graph g;
-  EXPECT_TRUE(ocgl::isNull(g, nullptr));
-  EXPECT_FALSE(ocgl::isNull(g, new PointerVertex));
-  EXPECT_FALSE(ocgl::isNull(g, new PointerEdge));
-  EXPECT_FALSE(ocgl::isValid(g, nullptr));
-  EXPECT_TRUE(ocgl::isValid(g, new PointerVertex));
-  EXPECT_TRUE(ocgl::isValid(g, new PointerEdge));
+  EXPECT_TRUE(ocgl::isNullVertex(g, nullptr));
+  EXPECT_TRUE(ocgl::isNullEdge(g, nullptr));
+  EXPECT_FALSE(ocgl::isNullVertex(g, new PointerVertex));
+  EXPECT_FALSE(ocgl::isNullEdge(g, new PointerEdge));
+  EXPECT_FALSE(ocgl::isValidVertex(g, nullptr));
+  EXPECT_FALSE(ocgl::isValidEdge(g, nullptr));
+  EXPECT_TRUE(ocgl::isValidVertex(g, new PointerVertex));
+  EXPECT_TRUE(ocgl::isValidEdge(g, new PointerEdge));
 }
 
 struct ObjectVertex
@@ -118,21 +132,16 @@ struct ObjectGraph
   using IncidentIter = float;
   using AdjacentIter = double;
 
-  template<typename VertexOrEdge>
-  static VertexOrEdge null();
+  static Vertex nullVertex()
+  {
+    return ObjectVertex{true};
+  }
+
+  static Edge nullEdge()
+  {
+    return ObjectEdge{true};
+  }
 };
-
-template<>
-ObjectVertex ObjectGraph::null<ObjectVertex>()
-{
-  return ObjectVertex{true};
-}
-
-template<>
-ObjectEdge ObjectGraph::null<ObjectEdge>()
-{
-  return ObjectEdge{true};
-}
 
 
 TEST(GraphTraitsTest, ObjectGraph)
@@ -149,20 +158,20 @@ TEST(GraphTraitsTest, ObjectGraph)
   EXPECT_TRUE((std::is_same<Graph::IncidentIter, ocgl::GraphTraits<Graph>::IncidentIter>::value));
   EXPECT_TRUE((std::is_same<Graph::AdjacentIter, ocgl::GraphTraits<Graph>::AdjacentIter>::value));
 
-  // test null()
-  EXPECT_EQ(ObjectVertex{true}, ocgl::GraphTraits<Graph>::null<ocgl::GraphTraits<Graph>::Vertex>());
-  EXPECT_EQ(ObjectEdge{true}, ocgl::GraphTraits<Graph>::null<ocgl::GraphTraits<Graph>::Edge>());
+  // test null
+  EXPECT_EQ(ObjectVertex{true}, ocgl::GraphTraits<Graph>::nullVertex());
+  EXPECT_EQ(ObjectEdge{true}, ocgl::GraphTraits<Graph>::nullEdge());
 
   // check isNull/isValid
   Graph g;
-  EXPECT_TRUE(ocgl::isNull(g, ObjectVertex{true}));
-  EXPECT_TRUE(ocgl::isNull(g, ObjectEdge{true}));
-  EXPECT_FALSE(ocgl::isNull(g, ObjectVertex{false}));
-  EXPECT_FALSE(ocgl::isNull(g, ObjectEdge{false}));
-  EXPECT_FALSE(ocgl::isValid(g, ObjectVertex{true}));
-  EXPECT_FALSE(ocgl::isValid(g, ObjectEdge{true}));
-  EXPECT_TRUE(ocgl::isValid(g, ObjectVertex{false}));
-  EXPECT_TRUE(ocgl::isValid(g, ObjectEdge{false}));
+  EXPECT_TRUE(ocgl::isNullVertex(g, ObjectVertex{true}));
+  EXPECT_TRUE(ocgl::isNullEdge(g, ObjectEdge{true}));
+  EXPECT_FALSE(ocgl::isNullVertex(g, ObjectVertex{false}));
+  EXPECT_FALSE(ocgl::isNullEdge(g, ObjectEdge{false}));
+  EXPECT_FALSE(ocgl::isValidVertex(g, ObjectVertex{true}));
+  EXPECT_FALSE(ocgl::isValidEdge(g, ObjectEdge{true}));
+  EXPECT_TRUE(ocgl::isValidVertex(g, ObjectVertex{false}));
+  EXPECT_TRUE(ocgl::isValidEdge(g, ObjectEdge{false}));
 }
 
 using GraphModels = ::testing::Types<IdGraph, PointerGraph, ObjectGraph>;

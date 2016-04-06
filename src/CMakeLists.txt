@@ -11,6 +11,7 @@ set(OCGL_HDRS
   Path.h
   Cycle.h
   CycleSpace.h
+  Subgraph.h
 
   predicate/HasProperty.h
   predicate/HasIndex.h

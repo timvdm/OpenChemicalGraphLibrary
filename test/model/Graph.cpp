@@ -7,7 +7,7 @@ GRAPH_TYPED_TEST(GraphTest);
 // test:
 //   addVertex
 //   numVertices
-//   getIndex
+//   getVertexIndex
 TYPED_TEST(GraphTest, addVertex)
 {
   TypeParam g;
@@ -16,21 +16,21 @@ TYPED_TEST(GraphTest, addVertex)
 
   auto v1 = ocgl::addVertex(g);
   EXPECT_EQ(1, ocgl::numVertices(g));
-  EXPECT_EQ(0, ocgl::getIndex(g, v1));
+  EXPECT_EQ(0, ocgl::getVertexIndex(g, v1));
 
   auto v2 = ocgl::addVertex(g);
   EXPECT_EQ(2, ocgl::numVertices(g));
-  EXPECT_EQ(1, ocgl::getIndex(g, v2));
+  EXPECT_EQ(1, ocgl::getVertexIndex(g, v2));
 
   auto v3 = ocgl::addVertex(g);
   EXPECT_EQ(3, ocgl::numVertices(g));
-  EXPECT_EQ(2, ocgl::getIndex(g, v3));
+  EXPECT_EQ(2, ocgl::getVertexIndex(g, v3));
 }
 
 // test:
 //   addEdge
 //   numEdges
-//   getIndex
+//   getEdgeIndex
 //   getSource
 //   getTarget
 //   getOther
@@ -47,7 +47,7 @@ TYPED_TEST(GraphTest, addEdge)
 
   auto e1 = ocgl::addEdge(g, v1, v2);
   EXPECT_EQ(1, ocgl::numEdges(g));
-  EXPECT_GE(0, ocgl::getIndex(g, e1));
+  EXPECT_GE(0, ocgl::getEdgeIndex(g, e1));
   EXPECT_EQ(v1, ocgl::getSource(g, e1));
   EXPECT_EQ(v2, ocgl::getTarget(g, e1));
   EXPECT_EQ(v2, ocgl::getOther(g, e1, v1));
@@ -55,7 +55,7 @@ TYPED_TEST(GraphTest, addEdge)
 
   auto e2 = ocgl::addEdge(g, v2, v3);
   EXPECT_EQ(2, ocgl::numEdges(g));
-  EXPECT_GE(1, ocgl::getIndex(g, e2));
+  EXPECT_GE(1, ocgl::getEdgeIndex(g, e2));
   EXPECT_EQ(v2, ocgl::getSource(g, e2));
   EXPECT_EQ(v3, ocgl::getTarget(g, e2));
   EXPECT_EQ(v3, ocgl::getOther(g, e2, v2));
@@ -63,7 +63,7 @@ TYPED_TEST(GraphTest, addEdge)
 
   auto e3 = ocgl::addEdge(g, v3, v4);
   EXPECT_EQ(3, ocgl::numEdges(g));
-  EXPECT_GE(2, ocgl::getIndex(g, e3));
+  EXPECT_GE(2, ocgl::getEdgeIndex(g, e3));
   EXPECT_EQ(v3, ocgl::getSource(g, e3));
   EXPECT_EQ(v4, ocgl::getTarget(g, e3));
   EXPECT_EQ(v4, ocgl::getOther(g, e3, v3));

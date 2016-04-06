@@ -37,14 +37,14 @@ int main(int argc, char **argv)
     std::cout << "  vertex indices: ";
     for (auto v : ocgl::getVertices(g))
       if (components.vertices[v] == c)
-        std::cout << ocgl::getIndex(g, v) << " ";
+        std::cout << ocgl::getVertexIndex(g, v) << " ";
     std::cout << std::endl;
 
     // vertex ids
     std::cout << "  edge indices: ";
     for (auto e : ocgl::getEdges(g))
       if (components.edges[e] == c)
-        std::cout << ocgl::getIndex(g, e) << " ";
+        std::cout << ocgl::getEdgeIndex(g, e) << " ";
     std::cout << std::endl;
   }
 }

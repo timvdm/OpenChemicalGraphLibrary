@@ -9,113 +9,121 @@ TYPED_TEST(HasIndexTest, HasIndex)
   auto g = ocgl::GraphStringParser<TypeParam>::parse("*****");
   auto V = ocgl::getVertices(g).toVector();
 
-  // HasIndexEQ
-  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasIndexEQ<TypeParam>(0)).size());
-  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasIndexEQ<TypeParam>(1)).size());
-  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasIndexEQ<TypeParam>(2)).size());
-  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasIndexEQ<TypeParam>(3)).size());
-  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasIndexEQ<TypeParam>(4)).size());
+  // HasVertexIndexEQ
+  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasVertexIndexEQ<TypeParam>(0)).size());
+  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasVertexIndexEQ<TypeParam>(1)).size());
+  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasVertexIndexEQ<TypeParam>(2)).size());
+  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasVertexIndexEQ<TypeParam>(3)).size());
+  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasVertexIndexEQ<TypeParam>(4)).size());
 
-  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasIndexEQ<TypeParam>(0)).size());
-  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasIndexEQ<TypeParam>(1)).size());
-  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasIndexEQ<TypeParam>(2)).size());
-  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasIndexEQ<TypeParam>(3)).size());
+  EXPECT_EQ(1, ocgl::getAdjacent(g, V[1], ocgl::HasVertexIndexEQ<TypeParam>(0)).size());
+  EXPECT_EQ(0, ocgl::getAdjacent(g, V[3], ocgl::HasVertexIndexEQ<TypeParam>(0)).size());
 
-  EXPECT_EQ(1, ocgl::getIncident(g, V[1], ocgl::HasIndexEQ<TypeParam>(0)).size());
-  EXPECT_EQ(0, ocgl::getIncident(g, V[3], ocgl::HasIndexEQ<TypeParam>(0)).size());
+  // HasEdgeIndexEQ
+  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasEdgeIndexEQ<TypeParam>(0)).size());
+  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasEdgeIndexEQ<TypeParam>(1)).size());
+  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasEdgeIndexEQ<TypeParam>(2)).size());
+  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasEdgeIndexEQ<TypeParam>(3)).size());
 
-  EXPECT_EQ(1, ocgl::getAdjacent(g, V[1], ocgl::HasIndexEQ<TypeParam>(0)).size());
-  EXPECT_EQ(0, ocgl::getAdjacent(g, V[3], ocgl::HasIndexEQ<TypeParam>(0)).size());
+  EXPECT_EQ(1, ocgl::getIncident(g, V[1], ocgl::HasEdgeIndexEQ<TypeParam>(0)).size());
+  EXPECT_EQ(0, ocgl::getIncident(g, V[3], ocgl::HasEdgeIndexEQ<TypeParam>(0)).size());
 
-  // HasIndexNE
-  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasIndexNE<TypeParam>(0)).size());
-  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasIndexNE<TypeParam>(1)).size());
-  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasIndexNE<TypeParam>(2)).size());
-  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasIndexNE<TypeParam>(3)).size());
-  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasIndexNE<TypeParam>(4)).size());
 
-  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasIndexNE<TypeParam>(0)).size());
-  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasIndexNE<TypeParam>(1)).size());
-  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasIndexNE<TypeParam>(2)).size());
-  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasIndexNE<TypeParam>(3)).size());
+  // HasVertexIndexNE
+  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasVertexIndexNE<TypeParam>(0)).size());
+  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasVertexIndexNE<TypeParam>(1)).size());
+  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasVertexIndexNE<TypeParam>(2)).size());
+  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasVertexIndexNE<TypeParam>(3)).size());
+  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasVertexIndexNE<TypeParam>(4)).size());
 
-  EXPECT_EQ(1, ocgl::getIncident(g, V[1], ocgl::HasIndexNE<TypeParam>(0)).size());
-  EXPECT_EQ(2, ocgl::getIncident(g, V[3], ocgl::HasIndexNE<TypeParam>(0)).size());
+  EXPECT_EQ(1, ocgl::getAdjacent(g, V[1], ocgl::HasVertexIndexNE<TypeParam>(0)).size());
+  EXPECT_EQ(2, ocgl::getAdjacent(g, V[3], ocgl::HasVertexIndexNE<TypeParam>(0)).size());
 
-  EXPECT_EQ(1, ocgl::getAdjacent(g, V[1], ocgl::HasIndexNE<TypeParam>(0)).size());
-  EXPECT_EQ(2, ocgl::getAdjacent(g, V[3], ocgl::HasIndexNE<TypeParam>(0)).size());
+  // HasEdgeIndexNE
+  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasEdgeIndexNE<TypeParam>(0)).size());
+  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasEdgeIndexNE<TypeParam>(1)).size());
+  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasEdgeIndexNE<TypeParam>(2)).size());
+  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasEdgeIndexNE<TypeParam>(3)).size());
 
-  // HasIndexLT
-  EXPECT_EQ(0, ocgl::getVertices(g, ocgl::HasIndexLT<TypeParam>(0)).size());
-  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasIndexLT<TypeParam>(1)).size());
-  EXPECT_EQ(2, ocgl::getVertices(g, ocgl::HasIndexLT<TypeParam>(2)).size());
-  EXPECT_EQ(3, ocgl::getVertices(g, ocgl::HasIndexLT<TypeParam>(3)).size());
-  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasIndexLT<TypeParam>(4)).size());
+  EXPECT_EQ(1, ocgl::getIncident(g, V[1], ocgl::HasEdgeIndexNE<TypeParam>(0)).size());
+  EXPECT_EQ(2, ocgl::getIncident(g, V[3], ocgl::HasEdgeIndexNE<TypeParam>(0)).size());
 
-  EXPECT_EQ(0, ocgl::getEdges(g, ocgl::HasIndexLT<TypeParam>(0)).size());
-  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasIndexLT<TypeParam>(1)).size());
-  EXPECT_EQ(2, ocgl::getEdges(g, ocgl::HasIndexLT<TypeParam>(2)).size());
-  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasIndexLT<TypeParam>(3)).size());
 
-  EXPECT_EQ(0, ocgl::getIncident(g, V[1], ocgl::HasIndexLT<TypeParam>(0)).size());
-  EXPECT_EQ(0, ocgl::getIncident(g, V[3], ocgl::HasIndexLT<TypeParam>(0)).size());
+  // HasVertexIndexLT
+  EXPECT_EQ(0, ocgl::getVertices(g, ocgl::HasVertexIndexLT<TypeParam>(0)).size());
+  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasVertexIndexLT<TypeParam>(1)).size());
+  EXPECT_EQ(2, ocgl::getVertices(g, ocgl::HasVertexIndexLT<TypeParam>(2)).size());
+  EXPECT_EQ(3, ocgl::getVertices(g, ocgl::HasVertexIndexLT<TypeParam>(3)).size());
+  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasVertexIndexLT<TypeParam>(4)).size());
 
-  EXPECT_EQ(0, ocgl::getAdjacent(g, V[1], ocgl::HasIndexLT<TypeParam>(0)).size());
-  EXPECT_EQ(0, ocgl::getAdjacent(g, V[3], ocgl::HasIndexLT<TypeParam>(0)).size());
+  EXPECT_EQ(0, ocgl::getAdjacent(g, V[1], ocgl::HasVertexIndexLT<TypeParam>(0)).size());
+  EXPECT_EQ(0, ocgl::getAdjacent(g, V[3], ocgl::HasVertexIndexLT<TypeParam>(0)).size());
 
-  // HasIndexGT
-  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasIndexGT<TypeParam>(0)).size());
-  EXPECT_EQ(3, ocgl::getVertices(g, ocgl::HasIndexGT<TypeParam>(1)).size());
-  EXPECT_EQ(2, ocgl::getVertices(g, ocgl::HasIndexGT<TypeParam>(2)).size());
-  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasIndexGT<TypeParam>(3)).size());
-  EXPECT_EQ(0, ocgl::getVertices(g, ocgl::HasIndexGT<TypeParam>(4)).size());
+  // HasEdgeIndexLT
+  EXPECT_EQ(0, ocgl::getEdges(g, ocgl::HasEdgeIndexLT<TypeParam>(0)).size());
+  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasEdgeIndexLT<TypeParam>(1)).size());
+  EXPECT_EQ(2, ocgl::getEdges(g, ocgl::HasEdgeIndexLT<TypeParam>(2)).size());
+  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasEdgeIndexLT<TypeParam>(3)).size());
 
-  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasIndexGT<TypeParam>(0)).size());
-  EXPECT_EQ(2, ocgl::getEdges(g, ocgl::HasIndexGT<TypeParam>(1)).size());
-  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasIndexGT<TypeParam>(2)).size());
-  EXPECT_EQ(0, ocgl::getEdges(g, ocgl::HasIndexGT<TypeParam>(3)).size());
+  EXPECT_EQ(0, ocgl::getIncident(g, V[1], ocgl::HasEdgeIndexLT<TypeParam>(0)).size());
+  EXPECT_EQ(0, ocgl::getIncident(g, V[3], ocgl::HasEdgeIndexLT<TypeParam>(0)).size());
 
-  EXPECT_EQ(1, ocgl::getIncident(g, V[1], ocgl::HasIndexGT<TypeParam>(0)).size());
-  EXPECT_EQ(2, ocgl::getIncident(g, V[3], ocgl::HasIndexGT<TypeParam>(0)).size());
+  // HasVertexIndexGT
+  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasVertexIndexGT<TypeParam>(0)).size());
+  EXPECT_EQ(3, ocgl::getVertices(g, ocgl::HasVertexIndexGT<TypeParam>(1)).size());
+  EXPECT_EQ(2, ocgl::getVertices(g, ocgl::HasVertexIndexGT<TypeParam>(2)).size());
+  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasVertexIndexGT<TypeParam>(3)).size());
+  EXPECT_EQ(0, ocgl::getVertices(g, ocgl::HasVertexIndexGT<TypeParam>(4)).size());
 
-  EXPECT_EQ(1, ocgl::getAdjacent(g, V[1], ocgl::HasIndexGT<TypeParam>(0)).size());
-  EXPECT_EQ(2, ocgl::getAdjacent(g, V[3], ocgl::HasIndexGT<TypeParam>(0)).size());
+  EXPECT_EQ(1, ocgl::getAdjacent(g, V[1], ocgl::HasVertexIndexGT<TypeParam>(0)).size());
+  EXPECT_EQ(2, ocgl::getAdjacent(g, V[3], ocgl::HasVertexIndexGT<TypeParam>(0)).size());
 
-  // HasIndexLE
-  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasIndexLE<TypeParam>(0)).size());
-  EXPECT_EQ(2, ocgl::getVertices(g, ocgl::HasIndexLE<TypeParam>(1)).size());
-  EXPECT_EQ(3, ocgl::getVertices(g, ocgl::HasIndexLE<TypeParam>(2)).size());
-  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasIndexLE<TypeParam>(3)).size());
-  EXPECT_EQ(5, ocgl::getVertices(g, ocgl::HasIndexLE<TypeParam>(4)).size());
+  // HasEdgeIndexGT
+  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasEdgeIndexGT<TypeParam>(0)).size());
+  EXPECT_EQ(2, ocgl::getEdges(g, ocgl::HasEdgeIndexGT<TypeParam>(1)).size());
+  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasEdgeIndexGT<TypeParam>(2)).size());
+  EXPECT_EQ(0, ocgl::getEdges(g, ocgl::HasEdgeIndexGT<TypeParam>(3)).size());
 
-  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasIndexLE<TypeParam>(0)).size());
-  EXPECT_EQ(2, ocgl::getEdges(g, ocgl::HasIndexLE<TypeParam>(1)).size());
-  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasIndexLE<TypeParam>(2)).size());
-  EXPECT_EQ(4, ocgl::getEdges(g, ocgl::HasIndexLE<TypeParam>(3)).size());
+  EXPECT_EQ(1, ocgl::getIncident(g, V[1], ocgl::HasEdgeIndexGT<TypeParam>(0)).size());
+  EXPECT_EQ(2, ocgl::getIncident(g, V[3], ocgl::HasEdgeIndexGT<TypeParam>(0)).size());
 
-  EXPECT_EQ(1, ocgl::getIncident(g, V[1], ocgl::HasIndexLE<TypeParam>(0)).size());
-  EXPECT_EQ(0, ocgl::getIncident(g, V[3], ocgl::HasIndexLE<TypeParam>(0)).size());
+  // HasVertexIndexLE
+  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasVertexIndexLE<TypeParam>(0)).size());
+  EXPECT_EQ(2, ocgl::getVertices(g, ocgl::HasVertexIndexLE<TypeParam>(1)).size());
+  EXPECT_EQ(3, ocgl::getVertices(g, ocgl::HasVertexIndexLE<TypeParam>(2)).size());
+  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasVertexIndexLE<TypeParam>(3)).size());
+  EXPECT_EQ(5, ocgl::getVertices(g, ocgl::HasVertexIndexLE<TypeParam>(4)).size());
 
-  EXPECT_EQ(1, ocgl::getAdjacent(g, V[1], ocgl::HasIndexLE<TypeParam>(0)).size());
-  EXPECT_EQ(0, ocgl::getAdjacent(g, V[3], ocgl::HasIndexLE<TypeParam>(0)).size());
+  EXPECT_EQ(1, ocgl::getAdjacent(g, V[1], ocgl::HasVertexIndexLE<TypeParam>(0)).size());
+  EXPECT_EQ(0, ocgl::getAdjacent(g, V[3], ocgl::HasVertexIndexLE<TypeParam>(0)).size());
 
-  // HasIndexGE
-  EXPECT_EQ(5, ocgl::getVertices(g, ocgl::HasIndexGE<TypeParam>(0)).size());
-  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasIndexGE<TypeParam>(1)).size());
-  EXPECT_EQ(3, ocgl::getVertices(g, ocgl::HasIndexGE<TypeParam>(2)).size());
-  EXPECT_EQ(2, ocgl::getVertices(g, ocgl::HasIndexGE<TypeParam>(3)).size());
-  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasIndexGE<TypeParam>(4)).size());
+  // HasEdgeIndexLE
+  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasEdgeIndexLE<TypeParam>(0)).size());
+  EXPECT_EQ(2, ocgl::getEdges(g, ocgl::HasEdgeIndexLE<TypeParam>(1)).size());
+  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasEdgeIndexLE<TypeParam>(2)).size());
+  EXPECT_EQ(4, ocgl::getEdges(g, ocgl::HasEdgeIndexLE<TypeParam>(3)).size());
 
-  EXPECT_EQ(4, ocgl::getEdges(g, ocgl::HasIndexGE<TypeParam>(0)).size());
-  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasIndexGE<TypeParam>(1)).size());
-  EXPECT_EQ(2, ocgl::getEdges(g, ocgl::HasIndexGE<TypeParam>(2)).size());
-  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasIndexGE<TypeParam>(3)).size());
+  EXPECT_EQ(1, ocgl::getIncident(g, V[1], ocgl::HasEdgeIndexLE<TypeParam>(0)).size());
+  EXPECT_EQ(0, ocgl::getIncident(g, V[3], ocgl::HasEdgeIndexLE<TypeParam>(0)).size());
 
-  EXPECT_EQ(2, ocgl::getIncident(g, V[1], ocgl::HasIndexGE<TypeParam>(0)).size());
-  EXPECT_EQ(2, ocgl::getIncident(g, V[3], ocgl::HasIndexGE<TypeParam>(0)).size());
+  // HasVertexIndexGE
+  EXPECT_EQ(5, ocgl::getVertices(g, ocgl::HasVertexIndexGE<TypeParam>(0)).size());
+  EXPECT_EQ(4, ocgl::getVertices(g, ocgl::HasVertexIndexGE<TypeParam>(1)).size());
+  EXPECT_EQ(3, ocgl::getVertices(g, ocgl::HasVertexIndexGE<TypeParam>(2)).size());
+  EXPECT_EQ(2, ocgl::getVertices(g, ocgl::HasVertexIndexGE<TypeParam>(3)).size());
+  EXPECT_EQ(1, ocgl::getVertices(g, ocgl::HasVertexIndexGE<TypeParam>(4)).size());
 
-  EXPECT_EQ(2, ocgl::getAdjacent(g, V[1], ocgl::HasIndexGE<TypeParam>(0)).size());
-  EXPECT_EQ(2, ocgl::getAdjacent(g, V[3], ocgl::HasIndexGE<TypeParam>(0)).size());
+  EXPECT_EQ(2, ocgl::getAdjacent(g, V[1], ocgl::HasVertexIndexGE<TypeParam>(0)).size());
+  EXPECT_EQ(2, ocgl::getAdjacent(g, V[3], ocgl::HasVertexIndexGE<TypeParam>(0)).size());
+
+  // HasEdgeIndexGE
+  EXPECT_EQ(4, ocgl::getEdges(g, ocgl::HasEdgeIndexGE<TypeParam>(0)).size());
+  EXPECT_EQ(3, ocgl::getEdges(g, ocgl::HasEdgeIndexGE<TypeParam>(1)).size());
+  EXPECT_EQ(2, ocgl::getEdges(g, ocgl::HasEdgeIndexGE<TypeParam>(2)).size());
+  EXPECT_EQ(1, ocgl::getEdges(g, ocgl::HasEdgeIndexGE<TypeParam>(3)).size());
+
+  EXPECT_EQ(2, ocgl::getIncident(g, V[1], ocgl::HasEdgeIndexGE<TypeParam>(0)).size());
+  EXPECT_EQ(2, ocgl::getIncident(g, V[3], ocgl::HasEdgeIndexGE<TypeParam>(0)).size());
 }
 
 

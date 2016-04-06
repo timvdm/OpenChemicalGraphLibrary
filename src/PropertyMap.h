@@ -18,9 +18,8 @@ namespace ocgl {
    *
    * A property map associates properties with vertices or edges. Access to
    * these properties is O(1) since these are stored in an array indexed by
-   * vertex or edge id. When a property map is created, storage is allocated
-   * based on the number of vertex or edge ids (i.e. numVertexIds() or
-   * numEdgeIds()).
+   * vertex or edge index. When a property map is created, storage is allocated
+   * based on the number of vertices or edges.
    */
   template<typename Graph, typename T, typename VertexOrEdgeTag>
   class PropertyMap
@@ -42,7 +41,7 @@ namespace ocgl {
        */
       PropertyMap(const Graph &graph) : m_graph(graph)
       {
-        init(VertexOrEdgeTag());
+        init();
       }
 
       /**
@@ -53,7 +52,7 @@ namespace ocgl {
        */
       PropertyMap(const Graph &graph, const T &value) : m_graph(graph)
       {
-        init(VertexOrEdgeTag());
+        init();
         std::fill(m_props.begin(), m_props.end(), value);
       }
 
@@ -66,44 +65,84 @@ namespace ocgl {
       }
 
       /**
-       * @brief Get const reference to vertex/edge property.
+       * @brief Get const reference to vertex property.
        *
-       * @param x The vertex/edge.
+       * @param v The vertex.
        *
-       * @pre isValid(g, x)
+       * @pre isValidVertex(g, v)
        */
-      template<typename VertexOrEdge>
-      ConstReference operator[](VertexOrEdge x) const
+      template<typename Tag = VertexOrEdgeTag>
+      typename std::enable_if<std::is_same<Tag, impl::VertexTag>::value, ConstReference>::type
+      operator[](typename GraphTraits<Graph>::Vertex v) const
       {
-        PRE(isValid(m_graph, x));
-        PRE_LT(getIndex(m_graph, x), m_props.size());
+        PRE(isValidVertex(m_graph, v));
+        PRE_LT(getVertexIndex(m_graph, v), m_props.size());
 
-        return m_props[getIndex(m_graph, x)];
+        return m_props[getVertexIndex(m_graph, v)];
       }
 
       /**
-       * @brief Get reference to vertex/edge property.
+       * @brief Get const reference to edge property.
        *
-       * @param x The vertex/edge.
+       * @param e The edge.
        *
-       * @pre isValid(g, x)
+       * @pre isValidEdge(g, e)
        */
-      template<typename VertexOrEdge>
-      Reference operator[](VertexOrEdge x)
+      template<typename Tag = VertexOrEdgeTag>
+      typename std::enable_if<std::is_same<Tag, impl::EdgeTag>::value, ConstReference>::type
+      operator[](typename GraphTraits<Graph>::Edge e) const
       {
-        PRE(isValid(m_graph, x));
-        PRE_LT(getIndex(m_graph, x), m_props.size());
+        PRE(isValidEdge(m_graph, e));
+        PRE_LT(getEdgeIndex(m_graph, e), m_props.size());
 
-        return m_props[getIndex(m_graph, x)];
+        return m_props[getEdgeIndex(m_graph, e)];
+      }
+
+      /**
+       * @brief Get reference to vertex property.
+       *
+       * @param v The vertex.
+       *
+       * @pre isValidVertex(g, v)
+       */
+      template<typename Tag = VertexOrEdgeTag>
+      typename std::enable_if<std::is_same<Tag, impl::VertexTag>::value, Reference>::type
+      operator[](typename GraphTraits<Graph>::Vertex v)
+      {
+        PRE(isValidVertex(m_graph, v));
+        PRE_LT(getVertexIndex(m_graph, v), m_props.size());
+
+        return m_props[getVertexIndex(m_graph, v)];
+      }
+
+      /**
+       * @brief Get reference to edge property.
+       *
+       * @param e The edge.
+       *
+       * @pre isValidEdge(g, e)
+       */
+      template<typename Tag = VertexOrEdgeTag>
+      typename std::enable_if<std::is_same<Tag, impl::EdgeTag>::value, Reference>::type
+      operator[](typename GraphTraits<Graph>::Edge e)
+      {
+        PRE(isValidEdge(m_graph, e));
+        PRE_LT(getEdgeIndex(m_graph, e), m_props.size());
+
+        return m_props[getEdgeIndex(m_graph, e)];
       }
 
     private:
-      void init(impl::VertexTag)
+      template<typename Tag = VertexOrEdgeTag>
+      typename std::enable_if<std::is_same<Tag, impl::VertexTag>::value>::type
+      init()
       {
         m_props.resize(numVertices(m_graph));
       }
 
-      void init(impl::EdgeTag)
+      template<typename Tag = VertexOrEdgeTag>
+      typename std::enable_if<std::is_same<Tag, impl::EdgeTag>::value>::type
+      init()
       {
         m_props.resize(numEdges(m_graph));
       }

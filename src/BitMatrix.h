@@ -262,6 +262,43 @@ namespace ocgl {
         return y;
       }
 
+      /**
+       * @brief Get the column index for the leading bit of a row.
+       */
+      int leadingBit(int row) const
+      {
+        auto j = 0;
+        for (; j < m_cols; ++j)
+          if (get(row, j))
+            return j;
+        return j;
+      }
+
+      /**
+       * @brief Eliminate the last row of the matrix.
+       *
+       * Exluding the last row, the matrix is expected to be in row echelon
+       * form. Additionally, the last row may not have 1 bits in columns that
+       * do not have 1 bits in rows above.
+       *
+       * @return The rank of the matrix.
+       */
+      int eliminateLastRow()
+      {
+        for (int y = 0; y < m_rows - 1; ++y) {
+          // find leading bit on current row
+          int x = leadingBit(y);
+
+          if (get(m_rows - 1, x))
+            xorRows(m_rows - 1, y);
+        }
+
+        if (leadingBit(m_rows - 1) == m_cols)
+          return m_rows - 1;
+
+        return m_rows;
+      }
+
     private:
       /**
        * @brief Get the number of blocks for a single row.

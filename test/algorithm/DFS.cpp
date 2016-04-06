@@ -26,27 +26,27 @@ struct DFSVisitor : public ocgl::algorithm::DFSVisitor<Graph>
 
   void vertex(const Graph &g, Vertex v)
   {
-    os << "vertex(" << ocgl::getIndex(g, v) << ")" << std::endl;
+    os << "vertex(" << ocgl::getVertexIndex(g, v) << ")" << std::endl;
   }
 
   void edge(const Graph &g, Edge e)
   {
-    os << "edge(" << ocgl::getIndex(g, e) << ")" << std::endl;
+    os << "edge(" << ocgl::getEdgeIndex(g, e) << ")" << std::endl;
   }
 
   void backEdge(const Graph &g, Edge e)
   {
-    os << "backEdge(" << ocgl::getIndex(g, e) << ")" << std::endl;
+    os << "backEdge(" << ocgl::getEdgeIndex(g, e) << ")" << std::endl;
   }
 
   void finishEdge(const Graph &g, Edge e)
   {
-    os << "finishEdge(" << ocgl::getIndex(g, e) << ")" << std::endl;
+    os << "finishEdge(" << ocgl::getEdgeIndex(g, e) << ")" << std::endl;
   }
 
   void finishVertex(const Graph &g, Vertex v)
   {
-    os << "finishVertex(" << ocgl::getIndex(g, v) << ")" << std::endl;
+    os << "finishVertex(" << ocgl::getVertexIndex(g, v) << ")" << std::endl;
   }
 
   std::ostream &os;

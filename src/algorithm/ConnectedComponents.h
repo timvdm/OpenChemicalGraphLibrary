@@ -2,6 +2,8 @@
 #define OCGL_ALGORITHM_CONNECTED_COMPONENTS_H
 
 #include <ocgl/algorithm/DFS.h>
+#include <ocgl/Subgraph.h>
+#include <ocgl/predicate/HasProperty.h>
 
 /**
  * @file ConnectedComponents.h
@@ -100,6 +102,41 @@ namespace ocgl {
     {
       return numConnectedComponents(connectedComponents(g));
     }
+
+
+
+    template<typename Graph>
+    std::vector<typename Subgraph<Graph>::Type> connectedComponentsSubgraphs(const Graph &g, const VertexEdgePropertyMap<Graph, unsigned int> &components)
+    {
+      using Sub = typename Subgraph<Graph>::Type;
+      using Super = typename ocgl::impl::SubSuper<Graph>::Type;
+
+      const Super &super = ocgl::impl::SubSuper<Graph>::get(g);
+
+      auto numComponents = numConnectedComponents(components);
+
+      std::vector<Sub> subgraphs;
+      for (unsigned int i = 0; i < numComponents; ++i) {
+        ocgl::VertexPropertyMap<Super, bool> vertexMask(super);
+        for (auto v : getVertices(g, predicate::HasPropertyEQ(components.vertices, i)))
+          vertexMask[v] = true;
+
+        ocgl::EdgePropertyMap<Super, bool> edgeMask(super);
+        for (auto e : getEdges(g, predicate::HasPropertyEQ(components.edges, i)))
+          edgeMask[e] = true;
+
+        subgraphs.push_back(makeSubgraph(super, vertexMask, edgeMask));
+      }
+
+      return subgraphs;
+    }
+
+    template<typename Graph>
+    std::vector<typename Subgraph<Graph>::Type> connectedComponentsSubgraphs(const Graph &g)
+    {
+      return connectedComponentsSubgraphs(g, connectedComponents(g));
+    }
+
 
   } // namespace algorithm
 

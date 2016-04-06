@@ -79,8 +79,12 @@ namespace ocgl {
     using IncidentIter = std::vector<EdgeIndex>::const_iterator;
     using AdjacentIter = AdjacentIterator<model::IndexGraph>;
 
-    template<typename VertexOrEdge>
-    static VertexOrEdge null()
+    static Vertex nullVertex()
+    {
+      return std::numeric_limits<Index>::max();
+    }
+
+    static Edge nullEdge()
     {
       return std::numeric_limits<Index>::max();
     }
@@ -119,7 +123,12 @@ namespace ocgl {
       return index;
     }
 
-    inline Index get_index(const IndexGraph &g, Index index)
+    inline VertexIndex get_vertex_index(const IndexGraph &g, VertexIndex index)
+    {
+      return index;
+    }
+
+    inline EdgeIndex get_edge_index(const IndexGraph &g, EdgeIndex index)
     {
       return index;
     }

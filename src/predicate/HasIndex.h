@@ -3,11 +3,12 @@
 
 #include <ocgl/PropertyMap.h>
 
+#include <type_traits>
 #include <functional>
 
 /**
  * @file HasIndex.h
- * @brief HasIndex vertex and edge predicates.
+ * @brief HasVertexIndex and HasEdgeIndex predicates.
  */
 
 namespace ocgl {
@@ -19,14 +20,20 @@ namespace ocgl {
      *
      * Functions are provided to help instantiate this class:
      *
-     * - HasIndexEQ(properties, value)
-     * - HasIndexNE(properties, value)
-     * - HasIndexLT(properties, value)
-     * - HasIndexGT(properties, value)
-     * - HasIndexLE(properties, value)
-     * - HasIndexGE(properties, value)
+     * - HasVertexIndexEQ(value)
+     * - HasVertexIndexNE(value)
+     * - HasVertexIndexLT(value)
+     * - HasVertexIndexGT(value)
+     * - HasVertexIndexLE(value)
+     * - HasVertexIndexGE(value)
+     * - HasEdgeIndexEQ(value)
+     * - HasEdgeIndexNE(value)
+     * - HasEdgeIndexLT(value)
+     * - HasEdgeIndexGT(value)
+     * - HasEdgeIndexLE(value)
+     * - HasEdgeIndexGE(value)
      */
-    template<typename Graph, typename Compare>
+    template<typename Graph, typename Compare, typename VertexOrEdgeTag>
     class HasIndex
     {
       public:
@@ -40,15 +47,29 @@ namespace ocgl {
         }
 
         /**
-         * @brief The call operator itself.
+         * @brief The call operator for vertices.
          *
          * @param g The graph.
-         * @param x The vertex or edge.
+         * @param v The vertex.
          */
-        template<typename VertexOrEdge>
-        bool operator()(const Graph &g, VertexOrEdge x) const
+        template<typename Tag = VertexOrEdgeTag>
+        typename std::enable_if<std::is_same<Tag, impl::VertexTag>::value, bool>::type
+        operator()(const Graph &g, typename GraphTraits<Graph>::Vertex v) const
         {
-          return m_compare(getIndex(g, x), m_value);
+          return m_compare(getVertexIndex(g, v), m_value);
+        }
+
+        /**
+         * @brief The call operator for edges.
+         *
+         * @param g The graph.
+         * @param e The edge.
+         */
+        template<typename Tag = VertexOrEdgeTag>
+        typename std::enable_if<std::is_same<Tag, impl::EdgeTag>::value, bool>::type
+        operator()(const Graph &g, typename GraphTraits<Graph>::Edge e) const
+        {
+          return m_compare(getEdgeIndex(g, e), m_value);
         }
 
       private:
@@ -60,19 +81,26 @@ namespace ocgl {
      * @cond impl
      */
 
-#define HAS_INDEX_PREDICATE(cmp_name, cmp_functor) \
+#define HAS_INDEX_PREDICATE(name, tag, cmp_name, cmp_functor) \
     template<typename Graph> \
-    HasIndex<Graph, cmp_functor<Index>> \
-    HasIndex##cmp_name(Index value) { \
-      return HasIndex<Graph, cmp_functor<Index>>(value); \
+    HasIndex<Graph, cmp_functor<Index>, tag> \
+    Has##name##Index##cmp_name(Index value) { \
+      return HasIndex<Graph, cmp_functor<Index>, tag>(value); \
     }
 
-    HAS_INDEX_PREDICATE(EQ, std::equal_to);
-    HAS_INDEX_PREDICATE(NE, std::not_equal_to);
-    HAS_INDEX_PREDICATE(LT, std::less);
-    HAS_INDEX_PREDICATE(GT, std::greater);
-    HAS_INDEX_PREDICATE(LE, std::less_equal);
-    HAS_INDEX_PREDICATE(GE, std::greater_equal);
+    HAS_INDEX_PREDICATE(Vertex, impl::VertexTag, EQ, std::equal_to);
+    HAS_INDEX_PREDICATE(Vertex, impl::VertexTag, NE, std::not_equal_to);
+    HAS_INDEX_PREDICATE(Vertex, impl::VertexTag, LT, std::less);
+    HAS_INDEX_PREDICATE(Vertex, impl::VertexTag, GT, std::greater);
+    HAS_INDEX_PREDICATE(Vertex, impl::VertexTag, LE, std::less_equal);
+    HAS_INDEX_PREDICATE(Vertex, impl::VertexTag, GE, std::greater_equal);
+
+    HAS_INDEX_PREDICATE(Edge, impl::EdgeTag, EQ, std::equal_to);
+    HAS_INDEX_PREDICATE(Edge, impl::EdgeTag, NE, std::not_equal_to);
+    HAS_INDEX_PREDICATE(Edge, impl::EdgeTag, LT, std::less);
+    HAS_INDEX_PREDICATE(Edge, impl::EdgeTag, GT, std::greater);
+    HAS_INDEX_PREDICATE(Edge, impl::EdgeTag, LE, std::less_equal);
+    HAS_INDEX_PREDICATE(Edge, impl::EdgeTag, GE, std::greater_equal);
 
     /**
      * @endcond

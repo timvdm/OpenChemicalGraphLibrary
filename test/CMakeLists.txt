@@ -5,6 +5,7 @@ add_gtest(BitMatrix.cpp)
 add_gtest(Path.cpp)
 add_gtest(Cycle.cpp)
 add_gtest(CycleSpace.cpp)
+add_gtest(Subgraph.cpp)
 
 
 add_subdirectory(model)

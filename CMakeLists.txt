@@ -53,17 +53,34 @@ add_subdirectory(src)
 
 ############################################################
 #
-# Testing
+# Tests
 #
 ############################################################
 
-option(BUILD_TESTS "Build unittests (requires GTest)" OFF)
+option(BUILD_TESTS "Build unittests (requires google test library)" OFF)
 if(${BUILD_TESTS})
   find_package(GTest REQUIRED)
   include_directories(${GTEST_INCLUDE_DIRS})
   enable_testing()
   add_subdirectory(test)
 endif()
+
+############################################################
+#
+# Benchmarks
+#
+############################################################
+
+option(BUILD_BENCHMARKS "Build benchmarks (requires google benchmark library)" OFF)
+if(${BUILD_BENCHMARKS})
+  add_subdirectory(benchmark)
+endif()
+
+############################################################
+#
+# Examples
+#
+############################################################
 
 option(BUILD_EXAMPLES "Build examples" ON)
 if(${BUILD_EXAMPLES})

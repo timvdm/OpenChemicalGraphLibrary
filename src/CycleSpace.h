@@ -33,7 +33,7 @@ namespace ocgl {
        * @param g The graph.
        */
       CycleSpace(const Graph &g) : m_graph(g), m_B(numEdges(g)),
-          m_eliminated(true)
+          m_cyclicEdges(numEdges(g))
       {
         m_circuitRank = circuitRank(g);
       }
@@ -45,8 +45,8 @@ namespace ocgl {
        * @param circuitRank The circuit rank of the graph.
        */
       CycleSpace(const Graph &g, unsigned int circuitRank)
-        : m_graph(g), m_B(numEdges(g)), m_circuitRank(circuitRank),
-          m_eliminated(true)
+        : m_graph(g), m_B(numEdges(g)), m_cyclicEdges(numEdges(g)),
+          m_circuitRank(circuitRank)
       {
       }
 
@@ -55,17 +55,20 @@ namespace ocgl {
        *
        * @param cycle The edge cycle to add.
        */
-      void add(const EdgeCycle<Graph> &cycle)
+      void add(const EdgeCycle<Graph> &cycle, bool update = true)
       {
         // get the index for the new row
         int row = m_B.rows();
         // add the new row
         m_B.addRow();
         // set the bits for the edges
-        for (auto e : cycle)
-          m_B.set(row, getIndex(m_graph, e));
-        // mark B as not eliminated
-        m_eliminated = false;
+        for (auto e : cycle) {
+          m_B.set(row, getEdgeIndex(m_graph, e));
+          m_cyclicEdges[getEdgeIndex(m_graph, e)] = true;
+        }
+
+        if (update)
+          updateMatrix();
       }
 
       /**
@@ -73,9 +76,9 @@ namespace ocgl {
        *
        * @param cycle The vertex cycle to add.
        */
-      void add(const VertexCycle<Graph> &cycle)
+      void add(const VertexCycle<Graph> &cycle, bool update = true)
       {
-        add(cycle.edges(m_graph));
+        add(cycle.edges(m_graph), update);
       }
 
       /**
@@ -83,23 +86,22 @@ namespace ocgl {
        *
        * @param cycle The edge cycle to check.
        */
-      bool contains(const EdgeCycle<Graph> &cycle)
+      bool contains(const EdgeCycle<Graph> &cycle) const
       {
-        // make sure B is eliminated
-        if (!m_eliminated)
-          eliminate();
-
-        // copy B
-        BitMatrix B(m_B);
+        for (auto e : cycle)
+          if (!m_cyclicEdges[getEdgeIndex(m_graph, e)])
+            return false;
 
         // add cycle to copied B as new row
-        int row = B.rows();
-        B.addRow();
+        int row = m_B.rows();
+        m_B.addRow();
         for (auto e : cycle)
-          B.set(row, getIndex(m_graph, e));
+          m_B.set(row, getEdgeIndex(m_graph, e));
 
         // perform gaussian elimination on copied B
-        int rank = B.eliminate();
+        int rank = m_B.eliminateLastRow();
+
+        m_B.popRow();
 
         // if the number of rows is unchanged after both matrices have been
         // eliminated, the cycle is contained in B
@@ -111,7 +113,7 @@ namespace ocgl {
        *
        * @param cycle The vertex cycle to check.
        */
-      bool contains(const VertexCycle<Graph> &cycle)
+      bool contains(const VertexCycle<Graph> &cycle) const
       {
         return contains(cycle.edges(m_graph));
       }
@@ -126,28 +128,22 @@ namespace ocgl {
        */
       bool isBasis()
       {
-        // make sure B is eliminated
-        if (!m_eliminated)
-          eliminate();
-
         return m_B.rows() >= m_circuitRank;
       }
 
-    private:
       /**
        * Perform Gaussian elimination on the matrix and remove null rows.
        */
-      void eliminate()
+      void updateMatrix()
       {
         // run gaussian elimination on B
         int rank = m_B.eliminate();
         // remove any null rows
         while (m_B.rows() > rank)
           m_B.popRow();
-        // mark B as eliminated
-        m_eliminated = true;
       }
 
+    private:
       /**
        * @brief The graph.
        */
@@ -155,15 +151,15 @@ namespace ocgl {
       /**
        * @brief The bit matrix.
        */
-      BitMatrix m_B;
+      mutable BitMatrix m_B;
+      /**
+       * @brief Keep track of cyclic edges.
+       */
+      std::vector<bool> m_cyclicEdges;
       /**
        * @brief The graph's circuit rank.
        */
       unsigned int m_circuitRank;
-      /**
-       * @brief Flag to indicate whether the matrix is in row-echelon form.
-       */
-      bool m_eliminated;
   };
 
 } // namespace ocgl

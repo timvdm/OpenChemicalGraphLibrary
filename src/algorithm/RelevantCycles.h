@@ -9,6 +9,8 @@
 #include <ocgl/algorithm/CycleMembership.h>
 
 #include <memory>
+#include <thread>
+#include <future>
 
 /**
  * @file RelevantCycles.h
@@ -62,9 +64,9 @@ namespace ocgl {
       {
         Vertex u = y;
 
-        while (isValid(g, dijkstra.prev()[u])) {
+        while (isValidVertex(g, dijkstra.prev()[u])) {
           Vertex v = z;
-          while (isValid(g, dijkstra.prev()[v])) {
+          while (isValidVertex(g, dijkstra.prev()[v])) {
             if (u == v)
               return false;
             v = dijkstra.prev()[v];
@@ -185,7 +187,7 @@ namespace ocgl {
            */
           bool isOdd() const
           {
-            return isNull(*m_graph, m_x);
+            return isNullVertex(*m_graph, m_x);
           }
 
           /**
@@ -193,7 +195,7 @@ namespace ocgl {
            */
           bool isEven() const
           {
-            return isValid(*m_graph, m_x);
+            return isValidVertex(*m_graph, m_x);
           }
 
           bool operator<(const CycleFamily &other) const
@@ -282,8 +284,8 @@ namespace ocgl {
               callback(current);
             } else {
               // for any z such that (x, z) is in Ur
-              for (Index zi = 0; zi <= getIndex(*m_graph, m_r); ++zi)
-                if (m_Dr->isEdge(getIndex(*m_graph, x), zi))
+              for (Index zi = 0; zi <= getVertexIndex(*m_graph, m_r); ++zi)
+                if (m_Dr->isEdge(getVertexIndex(*m_graph, x), zi))
                   listPaths(getVertex(*m_graph, zi), current, callback);
             }
 
@@ -356,12 +358,14 @@ namespace ocgl {
 
           // compute Vr and for all t in Vr find a shortest path P(r, t) from r to t
           VertexPropertyMap<Graph, bool> vertexMask(g);
-          for (std::size_t i = 0; i < getIndex(g, r) + 1; ++i)
-            vertexMask[i] = cycleMembership.vertices[getVertex(g, i)];
+          for (std::size_t i = 0; i < getVertexIndex(g, r) + 1; ++i) {
+            auto v = getVertex(g, i);
+            vertexMask[v] = cycleMembership.vertices[v];
+          }
           Dijkstra<Graph> dijkstra(g, r, vertexMask);
 
           Vr.clear();
-          for (std::size_t i = 0; i <= getIndex(g, r); ++i)
+          for (std::size_t i = 0; i <= getVertexIndex(g, r); ++i)
             if (dijkstra.distance(getVertex(g, i)) < dijkstra.infinity())
               Vr.push_back(getVertex(g, i));
 
@@ -383,14 +387,14 @@ namespace ocgl {
                 S.push_back(z);
 
                 // add directed edge (y, z) to Dr
-                Dr->addEdge(getIndex(g, y), getIndex(g, z));
+                Dr->addEdge(getVertexIndex(g, y), getVertexIndex(g, z));
 
               // else if d(r, z) != d(r, y) + w((z, y))
               //     and pi(z) < pi(y)
               //     and P(r, y) ^ P(r, z) = {r}
               // then
               } else if (dijkstra.distance(z) != dijkstra.distance(y) + 1 &&
-                         getIndex(g, z) < getIndex(g, y) &&
+                         getVertexIndex(g, z) < getVertexIndex(g, y) &&
                          impl::pathsIntersectionIsSource(dijkstra, g, y, z)) {
 
                 // add to CI' the odd cycle C = P(r, y) + P(r, z) + (z, y)
@@ -461,7 +465,8 @@ namespace ocgl {
           if (lastSize < family.prototype().size()) {
             // add newly added relevant family prototypes to cycleSpace
             for (auto j : add)
-              cycleSpace.add(families[j].prototype());
+              cycleSpace.add(families[j].prototype(), false);
+            cycleSpace.updateMatrix();
             add.clear();
 
             // check if the cycle set is complete
@@ -489,6 +494,101 @@ namespace ocgl {
           families.erase(families.begin() + remove[remove.size() - i - 1]);
       }
 
+      template<typename Graph>
+      void selectRelevantCycleFamiliesSubrange(const std::vector<CycleFamily<Graph>> &families,
+          std::size_t begin, std::size_t end, CycleSpace<Graph> &cycleSpace,
+          std::vector<unsigned char> &add, std::vector<unsigned char> &remove)
+      {
+        for (auto i = begin; i < end; ++i) {
+          if (cycleSpace.contains(families[i].prototype())) {
+            remove[i] = 1;
+          } else {
+            add[i] = 1;
+          }
+        }
+      }
+
+
+      template<typename Graph>
+      void selectRelevantCycleFamiliesParallel(const Graph &g, unsigned int circuitRank,
+          std::vector<CycleFamily<Graph>> &families)
+      {
+        // if there are no families, there is nothing to do..
+        if (families.empty())
+          return;
+
+        // sort families by cycle size
+        std::sort(families.begin(), families.end());
+
+        // keep track of families that are not relevant
+        std::vector<unsigned char> remove(families.size());
+        // keep track of families that are relevant and not yet added to B
+        // (i.e. families of the current cycle size being considered)
+        std::vector<unsigned char> add(families.size());
+        // the cycle space of cycles smaller than the current cycle size
+        CycleSpace<Graph> cycleSpace(g, circuitRank);
+
+        std::size_t i = 0;
+        while (i < families.size()) {
+          // find all families with same size in range [i, j)
+          auto currentSize = families[i].prototype().size();
+          auto j = i;
+          for (; j < families.size(); ++j)
+            if (families[j].prototype().size() != currentSize)
+              break;
+
+          // check if families with current size are relevant
+          auto N = std::thread::hardware_concurrency();
+          if (j - i < 10 * N) {
+            // run in single thread
+            selectRelevantCycleFamiliesSubrange(families, i, j,
+                cycleSpace, add, remove);
+          } else {
+            // run in multiple threads
+            std::vector<std::future<void>> futures;
+            for (auto n = 0; n < N; ++n) {
+              auto count = (j - i) / N;
+              auto begin = i + n * count;
+              auto end = (n + 1 == N) ? j : i + (n + 1) * count;
+
+              futures.push_back(std::async([&] {
+                    selectRelevantCycleFamiliesSubrange(families, begin, end,
+                        cycleSpace, add, remove);
+                    }));
+            }
+
+            for (auto &f : futures)
+              f.wait();
+          }
+
+          // update cycleSpace: add newly added relevant family prototypes
+          for (auto k = 0; k < families.size(); ++k)
+            if (add[k])
+              cycleSpace.add(families[k].prototype(), false);
+          cycleSpace.updateMatrix();
+          std::fill(add.begin(), add.end(), 0);
+
+          // check if the cycle set is complete
+          if (cycleSpace.isBasis()) {
+            // all remaining families are not relevant
+            while (j < families.size()) {
+              remove[j] = 1;
+              ++j;
+            }
+            break;
+          }
+
+
+          // set i to next family size
+          i = j;
+        }
+
+        // remove all families that are not relevant
+        for (std::size_t i = 0; i < remove.size(); ++i)
+          if (remove[remove.size() - i - 1])
+            families.erase(families.begin() + remove.size() - i - 1);
+      }
+
     } // namespace impl
 
     /**
@@ -510,6 +610,7 @@ namespace ocgl {
 
       // select relevant families
       impl::selectRelevantCycleFamilies(g, circuitRank, families);
+      //impl::selectRelevantCycleFamiliesParallel(g, circuitRank, families);
 
       // enumerate relevant cycles
       VertexCycleList<Graph> cycles;
@@ -528,16 +629,54 @@ namespace ocgl {
      * minimum cycles bases. An alternative definition is that a cycle is
      * relevant if it is not the sum of smaller cycles.
      *
-     * @param graph The graph.
+     * @param g The graph.
      *
      * @return The set of relevant cycles.
      */
     template<typename Graph>
-    VertexCycleList<Graph> relevantCycles(const Graph &graph)
+    VertexCycleList<Graph> relevantCycles(const Graph &g)
     {
-      auto cycleMember = cycleMembership(graph);
-      return relevantCyclesVismara(graph, circuitRank(graph),
+      auto cycleMember = cycleMembership(g);
+      return relevantCyclesVismara(g, circuitRank(g),
           cycleMember);
+    }
+
+    template<typename Graph>
+    VertexCycleList<Graph> relevantCyclesSubgraphs(const Graph &g)
+    {
+      auto cycleMember = cycleMembership(g);
+
+      auto cycleGraph = makeSubgraph(g, cycleMember);
+
+      auto cycleSubgraphs = connectedComponentsSubgraphs(cycleGraph);
+
+      VertexCycleList<Graph> result;
+      for (auto &subg : cycleSubgraphs) {
+
+        if (numVertices(subg) == 5 && numEdges(subg) == 5)
+          continue;
+        if (numVertices(subg) == 6 && numEdges(subg) == 6)
+          continue;
+        if (numVertices(subg) == 9 && numEdges(subg) == 10)
+          continue;
+
+
+        auto subgraphCycles = relevantCyclesVismara(subg, circuitRank(subg, 1),
+            cycleMembership(subg));
+            //cycleMember);
+
+        for (auto &subgraphCycle : subgraphCycles) {
+          VertexCycle<Graph> cycle;
+          cycle.reserve(subgraphCycle.size());
+          for (auto v : subgraphCycle)
+            cycle.push_back(v);
+          result.push_back(cycle);
+        }
+
+        //std::copy(subgraphCycles.begin(), subgraphCycles.end(), std::back_inserter(result));
+      }
+
+      return result;
     }
 
   } // namespace algorithm
