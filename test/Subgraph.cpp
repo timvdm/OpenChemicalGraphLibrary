@@ -1,7 +1,6 @@
 #include <ocgl/Subgraph.h>
 #include <ocgl/algorithm/CycleMembership.h>
 #include <ocgl/algorithm/ConnectedComponents.h>
-#include <ocgl/algorithm/RelevantCycles.h>
 
 #include "test.h"
 

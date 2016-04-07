@@ -187,6 +187,17 @@ namespace ocgl {
       }
 
       /**
+       * @brief Constructor.
+       *
+       * @param g The graph.
+       * @param value The initial property value.
+       */
+      VertexEdgePropertyMap(const Graph &g, const T &value)
+        : vertices(g, value), edges(g, value)
+      {
+      }
+
+      /**
        * @brief Get the graph.
        */
       const Graph& graph() const

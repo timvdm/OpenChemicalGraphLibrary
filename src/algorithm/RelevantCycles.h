@@ -317,12 +317,10 @@ namespace ocgl {
        *
        * @param graph The graph.
        * @param circuitRank The circuit rank.
-       * @param cycleMembership Vertex and edge cycle membership.
        */
       template<typename Graph>
       std::vector<CycleFamily<Graph>> initialCycleFamilies(const Graph &g,
-          unsigned int circuitRank,
-          const VertexEdgePropertyMap<Graph, bool> &cycleMembership)
+          unsigned int circuitRank)
       {
         using Vertex = typename GraphTraits<Graph>::Vertex;
 
@@ -352,16 +350,11 @@ namespace ocgl {
 
         // for all r in V do
         for (auto r : getVertices(g)) {
-          // skip non-cycle vertices...
-          if (!cycleMembership.vertices[r])
-            continue;
-
           // compute Vr and for all t in Vr find a shortest path P(r, t) from r to t
           VertexPropertyMap<Graph, bool> vertexMask(g);
-          for (std::size_t i = 0; i < getVertexIndex(g, r) + 1; ++i) {
-            auto v = getVertex(g, i);
-            vertexMask[v] = cycleMembership.vertices[v];
-          }
+          for (std::size_t i = 0; i < getVertexIndex(g, r) + 1; ++i)
+            vertexMask[getVertex(g, i)] = true;
+
           Dijkstra<Graph> dijkstra(g, r, vertexMask);
 
           Vr.clear();
@@ -589,39 +582,74 @@ namespace ocgl {
           if (remove[remove.size() - i - 1])
             families.erase(families.begin() + remove.size() - i - 1);
       }
-    */
+      */
+
+      /**
+       * @brief Find the relevant cycles using Vismara algorithm.
+       *
+       * @param g The graph.
+       * @param circuitRank The circuit rank.
+       *
+       * @return The set of relevant cycles.
+       */
+      template<typename Graph>
+      VertexCycleList<Graph> relevantCyclesVismara(const Graph &g,
+          unsigned int circuitRank)
+      {
+        // find initial set of cycle families
+        std::vector<impl::CycleFamily<Graph>> families =
+          impl::initialCycleFamilies(g, circuitRank);
+
+        // select relevant families
+        impl::selectRelevantCycleFamilies(g, circuitRank, families);
+        //impl::selectRelevantCycleFamiliesParallel(g, circuitRank, families);
+
+        // enumerate relevant cycles
+        VertexCycleList<Graph> cycles;
+        for (auto &family : families)
+          family.enumerate([&cycles] (const VertexCycle<Graph> &cycle) {
+            cycles.push_back(cycle);
+          });
+
+        return cycles;
+      }
 
     } // namespace impl
 
+
     /**
-     * @brief Find the relevant cycles using Vismara algorithm.
+     * @brief Find the relevant cycles.
+     *
+     * The set of relevant cycles is formed by taking the union of all the
+     * minimum cycles bases. An alternative definition is that a cycle is
+     * relevant if it is not the sum of smaller cycles.
      *
      * @param g The graph.
-     * @param circuitRank The circuit rank.
-     * @param cycleMembership Vertex and edge cycle membership.
+     * @param cycleMembership The vertex and edge cycle membership.
      *
      * @return The set of relevant cycles.
      */
     template<typename Graph>
-    VertexCycleList<Graph> relevantCyclesVismara(const Graph &g, unsigned int circuitRank,
+    VertexCycleList<Graph> relevantCycles(const Graph &g,
         const VertexEdgePropertyMap<Graph, bool> &cycleMembership)
     {
-      // find initial set of cycle families
-      std::vector<impl::CycleFamily<Graph>> families =
-        impl::initialCycleFamilies(g, circuitRank, cycleMembership);
+      // make a subgraph with only cyclic vertices and edges
+      auto cycleGraph = makeSubgraph(g, cycleMembership);
+      // create a subgraph for each cyclic connected components
+      auto cycleSubgraphs = connectedComponentsSubgraphs(cycleGraph);
 
-      // select relevant families
-      impl::selectRelevantCycleFamilies(g, circuitRank, families);
-      //impl::selectRelevantCycleFamiliesParallel(g, circuitRank, families);
+      // perceive cycles for each subgraph
+      VertexCycleList<Graph> result;
+      for (auto &subg : cycleSubgraphs) {
+        // run algorithm on subgraph
+        auto subgraphCycles = impl::relevantCyclesVismara(subg,
+            circuitRank(subg, 1));
+        // copy result
+        std::copy(subgraphCycles.begin(), subgraphCycles.end(),
+            std::back_inserter(result));
+      }
 
-      // enumerate relevant cycles
-      VertexCycleList<Graph> cycles;
-      for (auto &family : families)
-        family.enumerate([&cycles] (const VertexCycle<Graph> &cycle) {
-          cycles.push_back(cycle);
-        });
-
-      return cycles;
+      return result;
     }
 
     /**
@@ -638,44 +666,7 @@ namespace ocgl {
     template<typename Graph>
     VertexCycleList<Graph> relevantCycles(const Graph &g)
     {
-      auto cycleMember = cycleMembership(g);
-      return relevantCyclesVismara(g, circuitRank(g),
-          cycleMember);
-    }
-
-    /**
-     * @brief Find the relevant cycles.
-     *
-     * The set of relevant cycles is formed by taking the union of all the
-     * minimum cycles bases. An alternative definition is that a cycle is
-     * relevant if it is not the sum of smaller cycles.
-     *
-     * This function considers each cyclic component individually.
-     *
-     * @param g The graph.
-     *
-     * @return The set of relevant cycles.
-     */
-    template<typename Graph>
-    VertexCycleList<Graph> relevantCyclesSubgraphs(const Graph &g)
-    {
-      auto cycleMember = cycleMembership(g);
-
-      auto cycleGraph = makeSubgraph(g, cycleMember);
-
-      auto cycleSubgraphs = connectedComponentsSubgraphs(cycleGraph);
-
-      VertexCycleList<Graph> result;
-      for (auto &subg : cycleSubgraphs) {
-
-        auto subgraphCycles = relevantCyclesVismara(subg, circuitRank(subg, 1),
-            cycleMembership(subg));
-            //cycleMember);
-
-        std::copy(subgraphCycles.begin(), subgraphCycles.end(), std::back_inserter(result));
-      }
-
-      return result;
+      return relevantCycles(g, cycleMembership(g));
     }
 
   } // namespace algorithm

@@ -37,6 +37,5 @@ RELEVANT_CYCLES_BENCHMARK(relevantCycles, nanotube_9n_9m_60A);
 RELEVANT_CYCLES_BENCHMARK(relevantCycles, nanotube_9n_9m_80A);
 
 RELEVANT_CYCLES_BENCHMARK(relevantCycles, pdb_2r4s);
-RELEVANT_CYCLES_BENCHMARK(relevantCyclesSubgraphs, pdb_2r4s);
 
 BENCHMARK_MAIN();

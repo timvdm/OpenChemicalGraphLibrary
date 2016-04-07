@@ -54,7 +54,7 @@ namespace ocgl {
 
       Subgraph(const Graph &g, const VertexPropertyMap<Graph, bool> &vertexMask,
           const EdgePropertyMap<Graph, bool> &edgeMask)
-        : m_graph(g), m_vertexMask(vertexMask), m_edgeMask(edgeMask),
+        : m_graph(&g), m_vertexMask(vertexMask), m_edgeMask(edgeMask),
           m_numVertices(0), m_numEdges(0)
       {
         init();
@@ -62,7 +62,7 @@ namespace ocgl {
 
 
       Subgraph(const Graph &g, const VertexEdgePropertyMap<Graph, bool> &mask)
-        : m_graph(g), m_vertexMask(mask.vertices), m_edgeMask(mask.edges),
+        : m_graph(&g), m_vertexMask(mask.vertices), m_edgeMask(mask.edges),
           m_numVertices(0), m_numEdges(0)
       {
         init();
@@ -71,7 +71,7 @@ namespace ocgl {
 
       const Graph& graph() const
       {
-        return m_graph;
+        return *m_graph;
       }
 
       static Vertex nullVertex()
@@ -96,44 +96,44 @@ namespace ocgl {
 
       Range<VertexIter> vertices() const
       {
-        return getVertices(m_graph,
+        return getVertices(*m_graph,
             ocgl::predicate::HasPropertyEQ(m_vertexMask, true));
       }
 
       Range<EdgeIter> edges() const
       {
-        return getEdges(m_graph,
+        return getEdges(*m_graph,
             ocgl::predicate::HasPropertyEQ(m_edgeMask, true));
       }
 
       Vertex vertex(VertexIndex subIndex) const
       {
         auto superIndex = m_sub2superVertexIndex[subIndex];
-        return getVertex(m_graph, superIndex);
+        return getVertex(*m_graph, superIndex);
       }
 
       Edge edge(EdgeIndex subIndex) const
       {
         auto superIndex = m_sub2superEdgeIndex[subIndex];
-        return getEdge(m_graph, superIndex);
+        return getEdge(*m_graph, superIndex);
       }
 
       VertexIndex vertexIndex(typename GraphTraits<Graph>::Vertex v) const
       {
-        auto superIndex = getVertexIndex(m_graph, v);
+        auto superIndex = getVertexIndex(*m_graph, v);
         return m_super2subVertexIndex[superIndex];
       }
 
       EdgeIndex edgeIndex(typename GraphTraits<Graph>::Edge e) const
       {
-        auto superIndex = getEdgeIndex(m_graph, e);
+        auto superIndex = getEdgeIndex(*m_graph, e);
         return m_super2subEdgeIndex[superIndex];
       }
 
       unsigned int degree(typename GraphTraits<Graph>::Vertex v) const
       {
         unsigned int result = 0;
-        for (auto w : getAdjacent(m_graph, v))
+        for (auto w : getAdjacent(*m_graph, v))
           if (m_vertexMask[w])
             result++;
         return result;
@@ -141,24 +141,24 @@ namespace ocgl {
 
       Range<IncidentIter> incident(typename GraphTraits<Graph>::Vertex v) const
       {
-        return getIncident(m_graph, v,
+        return getIncident(*m_graph, v,
             ocgl::predicate::HasPropertyEQ(m_edgeMask, true));
       }
 
       Range<AdjacentIter> adjacent(typename GraphTraits<Graph>::Vertex v) const
       {
-        return getAdjacent(m_graph, v,
+        return getAdjacent(*m_graph, v,
             ocgl::predicate::HasPropertyEQ(m_vertexMask, true));
       }
 
       typename GraphTraits<Graph>::Vertex source(typename GraphTraits<Graph>::Edge e) const
       {
-        return getSource(m_graph, e);
+        return getSource(*m_graph, e);
       }
 
       typename GraphTraits<Graph>::Vertex target(typename GraphTraits<Graph>::Edge e) const
       {
-        return getTarget(m_graph, e);
+        return getTarget(*m_graph, e);
       }
 
       const VertexPropertyMap<Graph, bool>& vertexMask() const
@@ -175,12 +175,12 @@ namespace ocgl {
       void init()
       {
         // count number of vertices
-        for (auto v : getVertices(m_graph))
+        for (auto v : getVertices(*m_graph))
           if (m_vertexMask[v])
             ++m_numVertices;
 
         // count number of edges
-        for (auto e : getEdges(m_graph))
+        for (auto e : getEdges(*m_graph))
           if (m_edgeMask[e])
             ++m_numEdges;
 
@@ -199,28 +199,28 @@ namespace ocgl {
         // create subgraph to supergraph vertex index map
         m_sub2superVertexIndex.reserve(m_numVertices);
         for (auto v : vertices())
-          m_sub2superVertexIndex.push_back(getVertexIndex(m_graph, v));
+          m_sub2superVertexIndex.push_back(getVertexIndex(*m_graph, v));
 
         // create subgraph to supergraph edge index map
         m_sub2superEdgeIndex.reserve(m_numEdges);
         for (auto e : edges())
-          m_sub2superEdgeIndex.push_back(getEdgeIndex(m_graph, e));
+          m_sub2superEdgeIndex.push_back(getEdgeIndex(*m_graph, e));
 
         // create supergraph to subgraph vertex index map
         Index index = 0;
-        m_super2subVertexIndex.resize(ocgl::numVertices(m_graph),
+        m_super2subVertexIndex.resize(ocgl::numVertices(*m_graph),
             std::numeric_limits<Index>::max());
-        for (auto v : getVertices(m_graph))
+        for (auto v : getVertices(*m_graph))
           if (m_vertexMask[v])
-            m_super2subVertexIndex[getVertexIndex(m_graph, v)] = index++;
+            m_super2subVertexIndex[getVertexIndex(*m_graph, v)] = index++;
 
         // create supergraph to subgraph edge index map
         index = 0;
-        m_super2subEdgeIndex.resize(ocgl::numEdges(m_graph),
+        m_super2subEdgeIndex.resize(ocgl::numEdges(*m_graph),
             std::numeric_limits<Index>::max());
-        for (auto e : getEdges(m_graph))
+        for (auto e : getEdges(*m_graph))
           if (m_edgeMask[e])
-            m_super2subEdgeIndex[getEdgeIndex(m_graph, e)] = index++;
+            m_super2subEdgeIndex[getEdgeIndex(*m_graph, e)] = index++;
 
         /*
         std::cout << "    V sub2super: ";
@@ -236,7 +236,7 @@ namespace ocgl {
 
       }
 
-      const Graph &m_graph;
+      const Graph *m_graph;
 
       const VertexPropertyMap<Graph, bool> m_vertexMask;
       const EdgePropertyMap<Graph, bool> m_edgeMask;
@@ -253,7 +253,6 @@ namespace ocgl {
 
   namespace impl {
 
-
     template<typename Graph>
     struct SubSuper<Subgraph<Graph>>
     {
@@ -264,7 +263,6 @@ namespace ocgl {
         return g.graph();
       }
     };
-
 
   } // namespace impl
 
