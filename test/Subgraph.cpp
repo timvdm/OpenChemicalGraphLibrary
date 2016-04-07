@@ -126,15 +126,15 @@ TYPED_TEST(SubgraphTest, Subgraph1)
 
 
 template<typename Graph>
-std::vector<typename ocgl::Subgraph<Graph>::Type> getSubgraphs(const Graph &g)
+std::vector<typename ocgl::Subgraph<Graph>::Sub> getSubgraphs(const Graph &g)
 {
-  return std::vector<typename ocgl::Subgraph<Graph>::Type>();
+  return std::vector<typename ocgl::Subgraph<Graph>::Sub>();
 }
 
 template<typename Graph>
-std::vector<typename ocgl::Subgraph<Graph>::Type> getSubgraphs(const Graph &g, const ocgl::VertexPropertyMap<Graph, bool> &props)
+std::vector<typename ocgl::Subgraph<Graph>::Sub> getSubgraphs(const Graph &g, const ocgl::VertexPropertyMap<Graph, bool> &props)
 {
-  return std::vector<typename ocgl::Subgraph<Graph>::Type>();
+  return std::vector<typename ocgl::Subgraph<Graph>::Sub>();
 }
 
 TYPED_TEST(SubgraphTest, SubgraphRecursive)
@@ -147,12 +147,12 @@ TYPED_TEST(SubgraphTest, SubgraphRecursive)
 
   ocgl::Subgraph<Graph> subg0 = ocgl::makeSubgraph<Graph>(g, vertexMask, edgeMask);
 
-  std::vector<typename ocgl::Subgraph<Graph>::Type> subgraphs0 = getSubgraphs(g);
+  std::vector<typename ocgl::Subgraph<Graph>::Sub> subgraphs0 = getSubgraphs(g);
 
-  std::vector<typename ocgl::Subgraph<Graph>::Type> subgraphs1 = getSubgraphs(subg0);
+  std::vector<typename ocgl::Subgraph<Graph>::Sub> subgraphs1 = getSubgraphs(subg0);
 
-  std::vector<typename ocgl::Subgraph<Graph>::Type> subgraphs2 = getSubgraphs(g, ocgl::VertexPropertyMap<Graph, bool>(g));
-  std::vector<typename ocgl::Subgraph<Graph>::Type> subgraphs3 = getSubgraphs(subg0, ocgl::VertexPropertyMap<ocgl::Subgraph<Graph>, bool>(subg0));
+  std::vector<typename ocgl::Subgraph<Graph>::Sub> subgraphs2 = getSubgraphs(g, ocgl::VertexPropertyMap<Graph, bool>(g));
+  std::vector<typename ocgl::Subgraph<Graph>::Sub> subgraphs3 = getSubgraphs(subg0, ocgl::VertexPropertyMap<ocgl::Subgraph<Graph>, bool>(subg0));
 
 }
 
@@ -184,7 +184,7 @@ TYPED_TEST(SubgraphTest, Subgraph2)
   ASSERT_EQ(2, cycleSubgraphs.size());
 
   // subgraph 1
-  const typename ocgl::Subgraph<Graph>::Type &subg0 = cycleSubgraphs[0];
+  const typename ocgl::Subgraph<Graph>::Sub &subg0 = cycleSubgraphs[0];
   ASSERT_EQ(6, ocgl::numVertices(subg0));
   ASSERT_EQ(6, ocgl::numEdges(subg0));
 
@@ -203,7 +203,7 @@ TYPED_TEST(SubgraphTest, Subgraph2)
   EXPECT_EQ(E[5], ocgl::getEdge(subg0, 5));
 
   // subgraph 2
-  const typename ocgl::Subgraph<Graph>::Type &subg1 = cycleSubgraphs[1];
+  const typename ocgl::Subgraph<Graph>::Sub &subg1 = cycleSubgraphs[1];
   ASSERT_EQ(6, ocgl::numVertices(subg1));
   ASSERT_EQ(6, ocgl::numEdges(subg1));
 

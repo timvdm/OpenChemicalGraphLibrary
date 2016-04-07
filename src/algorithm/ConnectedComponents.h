@@ -106,12 +106,12 @@ namespace ocgl {
 
 
     template<typename Graph>
-    std::vector<typename Subgraph<Graph>::Type> connectedComponentsSubgraphs(const Graph &g, const VertexEdgePropertyMap<Graph, unsigned int> &components)
+    std::vector<typename Subgraph<Graph>::Sub> connectedComponentsSubgraphs(const Graph &g, const VertexEdgePropertyMap<Graph, unsigned int> &components)
     {
-      using Sub = typename Subgraph<Graph>::Type;
-      using Super = typename ocgl::impl::SubSuper<Graph>::Type;
+      using Sub = typename Subgraph<Graph>::Sub;
+      using Super = typename Subgraph<Graph>::Super;
 
-      const Super &super = ocgl::impl::SubSuper<Graph>::get(g);
+      const Super &super = Subgraph<Graph>::super(g);
 
       auto numComponents = numConnectedComponents(components);
 
@@ -132,7 +132,7 @@ namespace ocgl {
     }
 
     template<typename Graph>
-    std::vector<typename Subgraph<Graph>::Type> connectedComponentsSubgraphs(const Graph &g)
+    std::vector<typename Subgraph<Graph>::Sub> connectedComponentsSubgraphs(const Graph &g)
     {
       return connectedComponentsSubgraphs(g, connectedComponents(g));
     }

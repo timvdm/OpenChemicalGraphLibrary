@@ -99,19 +99,19 @@ TYPED_TEST(ConnectedComponentsTest, ConnectedComponentSubgraphs1)
 
   auto components = ocgl::algorithm::connectedComponents(g);
 
-  std::vector<typename ocgl::Subgraph<Graph>::Type> subgraphs = ocgl::algorithm::connectedComponentsSubgraphs(g, components);
+  std::vector<typename ocgl::Subgraph<Graph>::Sub> subgraphs = ocgl::algorithm::connectedComponentsSubgraphs(g, components);
 
   ASSERT_EQ(3, subgraphs.size());
 
   // subgraph 0
-  const typename ocgl::Subgraph<Graph>::Type &subg0 = subgraphs[0];
+  const typename ocgl::Subgraph<Graph>::Sub &subg0 = subgraphs[0];
   ASSERT_EQ(1, ocgl::numVertices(subg0));
   ASSERT_EQ(0, ocgl::numEdges(subg0));
 
   EXPECT_EQ(V[0], ocgl::getVertex(subg0, 0));
 
   // subgraph 1
-  const typename ocgl::Subgraph<Graph>::Type &subg1 = subgraphs[1];
+  const typename ocgl::Subgraph<Graph>::Sub &subg1 = subgraphs[1];
   ASSERT_EQ(4, ocgl::numVertices(subg1));
   ASSERT_EQ(3, ocgl::numEdges(subg1));
 
@@ -125,7 +125,7 @@ TYPED_TEST(ConnectedComponentsTest, ConnectedComponentSubgraphs1)
   EXPECT_EQ(E[2], ocgl::getEdge(subg1, 2));
 
   // subgraph 2
-  const typename ocgl::Subgraph<Graph>::Type &subg2 = subgraphs[2];
+  const typename ocgl::Subgraph<Graph>::Sub &subg2 = subgraphs[2];
   ASSERT_EQ(2, ocgl::numVertices(subg2));
   ASSERT_EQ(1, ocgl::numEdges(subg2));
 

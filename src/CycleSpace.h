@@ -54,6 +54,8 @@ namespace ocgl {
        * @brief Add an edge cycle to the cycle space.
        *
        * @param cycle The edge cycle to add.
+       * @param update When true, updateMatrix() will be called when the cycle
+       *               is added.
        */
       void addEdgeCycle(const EdgeCycle<Graph> &cycle, bool update = true)
       {
@@ -75,6 +77,8 @@ namespace ocgl {
        * @brief Add a vertex cycle to the cycle space.
        *
        * @param cycle The vertex cycle to add.
+       * @param update When true, updateMatrix() will be called when the cycle
+       *               is added.
        */
       void addVertexCycle(const VertexCycle<Graph> &cycle, bool update = true)
       {
