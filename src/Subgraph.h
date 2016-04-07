@@ -68,6 +68,27 @@ namespace ocgl {
         init();
       }
 
+      /**
+       * @brief Copy constructor.
+       */
+      Subgraph(const Subgraph<Graph> &other) = default;
+
+      /**
+       * @brief Move constructor.
+       */
+      Subgraph(Subgraph<Graph> &&other) = default;
+
+      /**
+       * @brief Copy assignment.
+       */
+      Subgraph<Graph>& operator=(const Subgraph<Graph> &other) = default;
+
+      /**
+       * @brief Move assignment.
+       */
+      Subgraph<Graph>& operator=(Subgraph<Graph> &&other) = default;
+
+
 
       const Graph& graph() const
       {

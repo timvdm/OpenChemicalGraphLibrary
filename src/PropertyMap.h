@@ -39,7 +39,7 @@ namespace ocgl {
        *
        * @param graph The graph.
        */
-      PropertyMap(const Graph &graph) : m_graph(graph)
+      PropertyMap(const Graph &graph) : m_graph(&graph)
       {
         init();
       }
@@ -50,18 +50,40 @@ namespace ocgl {
        * @param graph The graph.
        * @param value The initial property value.
        */
-      PropertyMap(const Graph &graph, const T &value) : m_graph(graph)
+      PropertyMap(const Graph &graph, const T &value) : m_graph(&graph)
       {
         init();
         std::fill(m_props.begin(), m_props.end(), value);
       }
 
       /**
+       * @brief Copy constructor.
+       */
+      PropertyMap(const PropertyMap<Graph, T, VertexOrEdgeTag> &other) = default;
+
+      /**
+       * @brief Move constructor.
+       */
+      PropertyMap(PropertyMap<Graph, T, VertexOrEdgeTag> &&other) = default;
+
+      /**
+       * @brief Copy assignment.
+       */
+      PropertyMap<Graph, T, VertexOrEdgeTag>& operator=(
+          const PropertyMap<Graph, T, VertexOrEdgeTag> &other) = default;
+
+      /**
+       * @brief Move assignment.
+       */
+      PropertyMap<Graph, T, VertexOrEdgeTag>& operator=(
+          PropertyMap<Graph, T, VertexOrEdgeTag> &&other) = default;
+
+      /**
        * @brief Get the graph.
        */
       const Graph& graph() const
       {
-        return m_graph;
+        return *m_graph;
       }
 
       /**
@@ -69,16 +91,17 @@ namespace ocgl {
        *
        * @param v The vertex.
        *
-       * @pre isValidVertex(g, v)
+       * @pre isValidVertex(graph(), v)
+       * @pre getVertexIndex(graph(), v) < numVertices(graph())
        */
       template<typename Tag = VertexOrEdgeTag>
       typename std::enable_if<std::is_same<Tag, impl::VertexTag>::value, ConstReference>::type
       operator[](typename GraphTraits<Graph>::Vertex v) const
       {
-        PRE(isValidVertex(m_graph, v));
-        PRE_LT(getVertexIndex(m_graph, v), m_props.size());
+        PRE(isValidVertex(*m_graph, v));
+        PRE_LT(getVertexIndex(*m_graph, v), m_props.size());
 
-        return m_props[getVertexIndex(m_graph, v)];
+        return m_props[getVertexIndex(*m_graph, v)];
       }
 
       /**
@@ -86,16 +109,17 @@ namespace ocgl {
        *
        * @param e The edge.
        *
-       * @pre isValidEdge(g, e)
+       * @pre isValidEdge(graph(), e)
+       * @pre getEdgeIndex(graph(), v) < numEdges(graph())
        */
       template<typename Tag = VertexOrEdgeTag>
       typename std::enable_if<std::is_same<Tag, impl::EdgeTag>::value, ConstReference>::type
       operator[](typename GraphTraits<Graph>::Edge e) const
       {
-        PRE(isValidEdge(m_graph, e));
-        PRE_LT(getEdgeIndex(m_graph, e), m_props.size());
+        PRE(isValidEdge(*m_graph, e));
+        PRE_LT(getEdgeIndex(*m_graph, e), m_props.size());
 
-        return m_props[getEdgeIndex(m_graph, e)];
+        return m_props[getEdgeIndex(*m_graph, e)];
       }
 
       /**
@@ -103,16 +127,17 @@ namespace ocgl {
        *
        * @param v The vertex.
        *
-       * @pre isValidVertex(g, v)
+       * @pre isValidVertex(graph(), v)
+       * @pre getVertexIndex(graph(), v) < numVertices(graph())
        */
       template<typename Tag = VertexOrEdgeTag>
       typename std::enable_if<std::is_same<Tag, impl::VertexTag>::value, Reference>::type
       operator[](typename GraphTraits<Graph>::Vertex v)
       {
-        PRE(isValidVertex(m_graph, v));
-        PRE_LT(getVertexIndex(m_graph, v), m_props.size());
+        PRE(isValidVertex(*m_graph, v));
+        PRE_LT(getVertexIndex(*m_graph, v), m_props.size());
 
-        return m_props[getVertexIndex(m_graph, v)];
+        return m_props[getVertexIndex(*m_graph, v)];
       }
 
       /**
@@ -120,16 +145,17 @@ namespace ocgl {
        *
        * @param e The edge.
        *
-       * @pre isValidEdge(g, e)
+       * @pre isValidEdge(graph(), e)
+       * @pre getEdgeIndex(graph(), v) < numEdges(graph())
        */
       template<typename Tag = VertexOrEdgeTag>
       typename std::enable_if<std::is_same<Tag, impl::EdgeTag>::value, Reference>::type
       operator[](typename GraphTraits<Graph>::Edge e)
       {
-        PRE(isValidEdge(m_graph, e));
-        PRE_LT(getEdgeIndex(m_graph, e), m_props.size());
+        PRE(isValidEdge(*m_graph, e));
+        PRE_LT(getEdgeIndex(*m_graph, e), m_props.size());
 
-        return m_props[getEdgeIndex(m_graph, e)];
+        return m_props[getEdgeIndex(*m_graph, e)];
       }
 
     private:
@@ -137,20 +163,20 @@ namespace ocgl {
       typename std::enable_if<std::is_same<Tag, impl::VertexTag>::value>::type
       init()
       {
-        m_props.resize(numVertices(m_graph));
+        m_props.resize(numVertices(*m_graph));
       }
 
       template<typename Tag = VertexOrEdgeTag>
       typename std::enable_if<std::is_same<Tag, impl::EdgeTag>::value>::type
       init()
       {
-        m_props.resize(numEdges(m_graph));
+        m_props.resize(numEdges(*m_graph));
       }
 
       /**
        * @brief The graph.
        */
-      const Graph &m_graph;
+      const Graph *m_graph;
       /**
        * @brief The properties.
        */
