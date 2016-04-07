@@ -9,8 +9,8 @@
 #include <ocgl/algorithm/CycleMembership.h>
 
 #include <memory>
-#include <thread>
-#include <future>
+//#include <thread>
+//#include <future>
 
 /**
  * @file RelevantCycles.h
