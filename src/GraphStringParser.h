@@ -3,10 +3,11 @@
 
 #include <ocgl/GraphTraits.h>
 
+#include <stdexcept>
 #include <vector>
 #include <string>
+#include <cctype>
 #include <map>
-#include <stdexcept>
 
 /**
  * @file GraphStringParser.h
