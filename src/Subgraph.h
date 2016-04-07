@@ -259,8 +259,8 @@ namespace ocgl {
 
       const Graph *m_graph;
 
-      const VertexPropertyMap<Graph, bool> m_vertexMask;
-      const EdgePropertyMap<Graph, bool> m_edgeMask;
+      VertexPropertyMap<Graph, bool> m_vertexMask;
+      EdgePropertyMap<Graph, bool> m_edgeMask;
 
       std::vector<Index> m_sub2superVertexIndex;
       std::vector<Index> m_sub2superEdgeIndex;
