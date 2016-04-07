@@ -84,7 +84,8 @@ namespace ocgl {
      * @param components The connected components (see connectedComponents()).
      */
     template<typename Graph>
-    unsigned int numConnectedComponents(const VertexEdgePropertyMap<Graph, unsigned int> &components)
+    unsigned int numConnectedComponents(const VertexEdgePropertyMap<Graph,
+        unsigned int> &components)
     {
       unsigned int max = 0;
       for (auto v : getVertices(components.graph()))
@@ -103,34 +104,33 @@ namespace ocgl {
       return numConnectedComponents(connectedComponents(g));
     }
 
-
-
+    /**
+     * @brief Get a list of connected component subgraphs.
+     *
+     * @param g The graph.
+     * @param components The connected components.
+     */
     template<typename Graph>
-    std::vector<typename Subgraph<Graph>::Sub> connectedComponentsSubgraphs(const Graph &g, const VertexEdgePropertyMap<Graph, unsigned int> &components)
+    std::vector<typename Subgraph<Graph>::Sub> connectedComponentsSubgraphs(const Graph &g,
+        const VertexEdgePropertyMap<Graph, unsigned int> &components)
     {
-      using Sub = typename Subgraph<Graph>::Sub;
-      using Super = typename Subgraph<Graph>::Super;
-
-      const Super &super = Subgraph<Graph>::super(g);
-
       auto numComponents = numConnectedComponents(components);
 
-      std::vector<Sub> subgraphs;
+      std::vector<typename Subgraph<Graph>::Sub> subgraphs;
       for (unsigned int i = 0; i < numComponents; ++i) {
-        ocgl::VertexPropertyMap<Super, bool> vertexMask(super);
-        for (auto v : getVertices(g, predicate::HasPropertyEQ(components.vertices, i)))
-          vertexMask[v] = true;
-
-        ocgl::EdgePropertyMap<Super, bool> edgeMask(super);
-        for (auto e : getEdges(g, predicate::HasPropertyEQ(components.edges, i)))
-          edgeMask[e] = true;
-
-        subgraphs.push_back(makeSubgraph(super, vertexMask, edgeMask));
+        subgraphs.push_back(makeSubgraph(g,
+              predicate::HasPropertyEQ(components.vertices, i),
+              predicate::HasPropertyEQ(components.edges, i)));
       }
 
       return subgraphs;
     }
 
+    /**
+     * @brief Get a list of connected component subgraphs.
+     *
+     * @param g The graph.
+     */
     template<typename Graph>
     std::vector<typename Subgraph<Graph>::Sub> connectedComponentsSubgraphs(const Graph &g)
     {

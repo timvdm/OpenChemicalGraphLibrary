@@ -466,11 +466,10 @@ namespace ocgl {
    * @param mask The vertex and edge mask.
    */
   template<typename Graph>
-  Subgraph<typename impl::SubSuper<Graph>::Type> makeSubgraph(const Graph &g,
-      const VertexEdgePropertyMap<typename impl::SubSuper<Graph>::Type, bool> &mask)
+  typename Subgraph<Graph>::Sub makeSubgraph(const Graph &g,
+      const VertexEdgePropertyMap<typename Subgraph<Graph>::Super, bool> &mask)
   {
-    return Subgraph<typename impl::SubSuper<Graph>::Type>(
-        impl::SubSuper<Graph>::get(g), mask);
+    return typename Subgraph<Graph>::Sub(Subgraph<Graph>::super(g), mask);
   }
 
   /**
@@ -484,12 +483,37 @@ namespace ocgl {
    * @param edgeMask The edge mask.
    */
   template<typename Graph>
-  Subgraph<typename impl::SubSuper<Graph>::Type> makeSubgraph(const Graph &g,
-      const VertexPropertyMap<typename impl::SubSuper<Graph>::Type, bool> &vertexMask,
-      const EdgePropertyMap<typename impl::SubSuper<Graph>::Type, bool> &edgeMask)
+  typename Subgraph<Graph>::Sub makeSubgraph(const Graph &g,
+      const VertexPropertyMap<typename Subgraph<Graph>::Super, bool> &vertexMask,
+      const EdgePropertyMap<typename Subgraph<Graph>::Super, bool> &edgeMask)
   {
-    return Subgraph<typename impl::SubSuper<Graph>::Type>(
-        impl::SubSuper<Graph>::get(g), vertexMask, edgeMask);
+    return typename Subgraph<Graph>::Sub(Subgraph<Graph>::super(g),
+        vertexMask, edgeMask);
+  }
+
+  /**
+   * @brief Create a subgraph.
+   *
+   * @param g The graph.
+   * @param vertexPredicate The vertex predicate.
+   * @param edgePredicate The edge predicate.
+   */
+  template<typename Graph, typename VertexPredicate, typename EdgePredicate>
+  typename Subgraph<Graph>::Sub makeSubgraph(const Graph &g,
+      const VertexPredicate &vertexPredicate, const EdgePredicate &edgePredicate)
+  {
+    using Super = typename Subgraph<Graph>::Super;
+    const Super &super = Subgraph<Graph>::super(g);
+
+    ocgl::VertexPropertyMap<Super, bool> vertexMask(super);
+    for (auto v : getVertices(g, vertexPredicate))
+      vertexMask[v] = true;
+
+    ocgl::EdgePropertyMap<Super, bool> edgeMask(super);
+    for (auto e : getEdges(g, edgePredicate))
+      edgeMask[e] = true;
+
+    return makeSubgraph(super, vertexMask, edgeMask);
   }
 
   /**
