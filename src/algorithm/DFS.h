@@ -39,7 +39,10 @@ namespace ocgl {
        *
        * @param g The graph.
        */
-      void initialize(const Graph &g) {}
+      void initialize(const Graph &g)
+      {
+        UNUSED(g);
+      }
 
       /**
        * @brief A new component starts.
@@ -47,7 +50,11 @@ namespace ocgl {
        * @param g The graph.
        * @param i The component (i.e. [0,n])
        */
-      void component(const Graph &g, unsigned int i) {}
+      void component(const Graph &g, unsigned int i)
+      {
+        UNUSED(g);
+        UNUSED(i);
+      }
 
       /**
        * @brief Visit a vertex.
@@ -57,7 +64,11 @@ namespace ocgl {
        * @param g The graph.
        * @param v The traversed vertex.
        */
-      void vertex(const Graph &g, Vertex v) {}
+      void vertex(const Graph &g, Vertex v)
+      {
+        UNUSED(g);
+        UNUSED(v);
+      }
 
       /**
        * @brief Visit an edge.
@@ -67,7 +78,11 @@ namespace ocgl {
        * @param g The graph.
        * @param e The traversed edge.
        */
-      void edge(const Graph &g, Edge e) {}
+      void edge(const Graph &g, Edge e)
+      {
+        UNUSED(g);
+        UNUSED(e);
+      }
 
       /**
        * @brief Visit a "back" edge.
@@ -78,7 +93,11 @@ namespace ocgl {
        * @param g The graph.
        * @param e The "back" edge.
        */
-      void backEdge(const Graph &g, Edge e) {}
+      void backEdge(const Graph &g, Edge e)
+      {
+        UNUSED(g);
+        UNUSED(e);
+      }
 
       /**
        * @brief Invoked when the edge's target vertex is finished.
@@ -88,7 +107,11 @@ namespace ocgl {
        * @param g The graph.
        * @param e The edge.
        */
-      void finishEdge(const Graph &g, Edge e) {}
+      void finishEdge(const Graph &g, Edge e)
+      {
+        UNUSED(g);
+        UNUSED(e);
+      }
 
       /**
        * @brief Invoked when all incident edges are finished.
@@ -96,7 +119,11 @@ namespace ocgl {
        * @param g The graph.
        * @param v The vertex
        */
-      void finishVertex(const Graph &g, Vertex v) {}
+      void finishVertex(const Graph &g, Vertex v)
+      {
+        UNUSED(g);
+        UNUSED(v);
+      }
     };
 
     namespace impl {

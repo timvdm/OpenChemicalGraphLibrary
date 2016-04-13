@@ -51,7 +51,7 @@ namespace ocgl {
   template<typename Graph>
   bool isVertexPath(const Graph &g, const VertexList<Graph> &p)
   {
-    for (auto i = 1; i < p.size(); ++i)
+    for (std::size_t i = 1; i < p.size(); ++i)
       if (!isConnected(g, p[i - 1], p[i]))
         return false;
     return true;
@@ -72,7 +72,7 @@ namespace ocgl {
   template<typename Graph>
   bool isEdgePath(const Graph &g, const EdgeList<Graph> &p)
   {
-    for (auto i = 1; i < p.size(); ++i)
+    for (std::size_t i = 1; i < p.size(); ++i)
       if (commonVertex(g, p[i - 1], p[i]) == nullVertex<Graph>())
         return false;
     return true;
@@ -103,7 +103,7 @@ namespace ocgl {
     EdgePath<Graph> edges;
     edges.reserve(vertices.size());
 
-    for (auto i = 1; i < vertices.size(); ++i)
+    for (std::size_t i = 1; i < vertices.size(); ++i)
       edges.push_back(getEdge(g, vertices[i - 1], vertices[i]));
 
     return edges;
@@ -165,7 +165,7 @@ namespace ocgl {
     vertices.reserve(edges.size() + 1);
 
     vertices.push_back(edgePathSource(g, edges));
-    for (auto i = 1; i < edges.size(); ++i) {
+    for (std::size_t i = 1; i < edges.size(); ++i) {
       auto e1 = edges[i - 1];
       auto e2 = edges[i];
       vertices.push_back(commonVertex(g, e1, e2));

@@ -31,12 +31,12 @@ namespace ocgl {
             path.reserve(numVertices(g));
           }
 
-          void component(const Graph &g, unsigned int i)
+          void component(const Graph&, unsigned int)
           {
             path.clear();
           }
 
-          void vertex(const Graph &g, Vertex v)
+          void vertex(const Graph&, Vertex v)
           {
             path.push_back(v);
           }
@@ -64,7 +64,7 @@ namespace ocgl {
             }
           }
 
-          void finishVertex(const Graph &g, Vertex v)
+          void finishVertex(const Graph&, Vertex)
           {
             path.pop_back();
           }

@@ -113,22 +113,22 @@ namespace ocgl {
       return makeRange(IndexIterator(0), IndexIterator(num_edges(g)));
     }
 
-    inline VertexIndex get_vertex(const IndexGraph &g, VertexIndex index)
+    inline VertexIndex get_vertex(const IndexGraph&, VertexIndex index)
     {
       return index;
     }
 
-    inline EdgeIndex get_edge(const IndexGraph &g, EdgeIndex index)
+    inline EdgeIndex get_edge(const IndexGraph&, EdgeIndex index)
     {
       return index;
     }
 
-    inline VertexIndex get_vertex_index(const IndexGraph &g, VertexIndex index)
+    inline VertexIndex get_vertex_index(const IndexGraph&, VertexIndex index)
     {
       return index;
     }
 
-    inline EdgeIndex get_edge_index(const IndexGraph &g, EdgeIndex index)
+    inline EdgeIndex get_edge_index(const IndexGraph&, EdgeIndex index)
     {
       return index;
     }

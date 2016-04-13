@@ -14,6 +14,7 @@ include(Functions.cmake)
 include_directories(${CMAKE_BINARY_DIR}/include)
 
 set(IGNORE_WARNINGS
+  sign-compare
 #  "gnu-zero-variadic-macro-arguments"
 )
 
@@ -22,7 +23,7 @@ foreach(WARNING_NAME ${IGNORE_WARNINGS})
 endforeach()
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "-pedantic -Wall ${IGNORE_WARNINGS_FLAGS}")
+set(CMAKE_CXX_FLAGS "-pedantic -Wextra ${IGNORE_WARNINGS_FLAGS}")
 
 find_package(Threads)
 

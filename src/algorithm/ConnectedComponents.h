@@ -29,22 +29,22 @@ namespace ocgl {
           {
           }
 
-          void component(const Graph &g, unsigned int i)
+          void component(const Graph&, unsigned int i)
           {
             m_current = i;
           }
 
-          void vertex(const Graph &g, Vertex v)
+          void vertex(const Graph&, Vertex v)
           {
             m_component.vertices[v] = m_current;
           }
 
-          void edge(const Graph &g, Edge e)
+          void edge(const Graph&, Edge e)
           {
             m_component.edges[e] = m_current;
           }
 
-          void backEdge(const Graph &g, Edge e)
+          void backEdge(const Graph&, Edge e)
           {
             m_component.edges[e] = m_current;
           }

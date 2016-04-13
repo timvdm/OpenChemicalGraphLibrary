@@ -1,6 +1,7 @@
 #ifndef OCGL_GRAPH_TRAITS_H
 #define OCGL_GRAPH_TRAITS_H
 
+#include <ocgl/Unused.h>
 #include <ocgl/Contract.h>
 #include <ocgl/Range.h>
 #include <ocgl/FilterIterator.h>
@@ -658,6 +659,8 @@ namespace ocgl {
   template<typename Graph>
   bool isNullVertex(const Graph &g, typename GraphTraits<Graph>::Vertex v)
   {
+    UNUSED(g);
+
     return v == GraphTraits<Graph>::nullVertex();
   }
 
@@ -670,6 +673,8 @@ namespace ocgl {
   template<typename Graph>
   bool isNullEdge(const Graph &g, typename GraphTraits<Graph>::Edge e)
   {
+    UNUSED(g);
+
     return e == GraphTraits<Graph>::nullEdge();
   }
 

@@ -59,7 +59,7 @@ namespace ocgl {
       std::vector<Vertex> prev(1, nullVertex<Graph>());
       std::map<int, Vertex> backEdges;
 
-      for (auto i = 0; i < str.size(); ++i) {
+      for (std::size_t i = 0; i < str.size(); ++i) {
         auto c = str[i];
 
         switch (c) {

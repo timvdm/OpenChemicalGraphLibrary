@@ -315,12 +315,10 @@ namespace ocgl {
       /**
        * @brief Find the initial Vismara cycle families.
        *
-       * @param graph The graph.
-       * @param circuitRank The circuit rank.
+       * @param g The graph.
        */
       template<typename Graph>
-      std::vector<CycleFamily<Graph>> initialCycleFamilies(const Graph &g,
-          unsigned int circuitRank)
+      std::vector<CycleFamily<Graph>> initialCycleFamilies(const Graph &g)
       {
         using Vertex = typename GraphTraits<Graph>::Vertex;
 
@@ -598,7 +596,7 @@ namespace ocgl {
       {
         // find initial set of cycle families
         std::vector<impl::CycleFamily<Graph>> families =
-          impl::initialCycleFamilies(g, circuitRank);
+          impl::initialCycleFamilies(g);
 
         // select relevant families
         impl::selectRelevantCycleFamilies(g, circuitRank, families);

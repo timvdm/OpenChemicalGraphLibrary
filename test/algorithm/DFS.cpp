@@ -14,12 +14,12 @@ struct DFSVisitor : public ocgl::algorithm::DFSVisitor<Graph>
   {
   }
 
-  void initialize(const Graph &graph)
+  void initialize(const Graph&)
   {
     os << "initialize()" << std::endl;
   }
 
-  void component(const Graph &g, int i)
+  void component(const Graph&, int i)
   {
     os << "component(" << i << ")" << std::endl;
   }

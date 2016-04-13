@@ -126,13 +126,13 @@ TYPED_TEST(SubgraphTest, Subgraph1)
 
 
 template<typename Graph>
-std::vector<typename ocgl::Subgraph<Graph>::Sub> getSubgraphs(const Graph &g)
+std::vector<typename ocgl::Subgraph<Graph>::Sub> getSubgraphs(const Graph&)
 {
   return std::vector<typename ocgl::Subgraph<Graph>::Sub>();
 }
 
 template<typename Graph>
-std::vector<typename ocgl::Subgraph<Graph>::Sub> getSubgraphs(const Graph &g, const ocgl::VertexPropertyMap<Graph, bool> &props)
+std::vector<typename ocgl::Subgraph<Graph>::Sub> getSubgraphs(const Graph&, const ocgl::VertexPropertyMap<Graph, bool> &)
 {
   return std::vector<typename ocgl::Subgraph<Graph>::Sub>();
 }

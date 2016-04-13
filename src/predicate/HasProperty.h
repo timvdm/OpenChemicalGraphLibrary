@@ -58,6 +58,8 @@ namespace ocgl {
         typename std::enable_if<std::is_same<Tag, impl::VertexTag>::value, bool>::type
         operator()(const Graph &g, typename GraphTraits<Graph>::Vertex v) const
         {
+          UNUSED(g);
+
           return m_compare(m_properties[v], m_value);
         }
 
@@ -71,6 +73,8 @@ namespace ocgl {
         typename std::enable_if<std::is_same<Tag, impl::EdgeTag>::value, bool>::type
         operator()(const Graph &g, typename GraphTraits<Graph>::Edge e) const
         {
+          UNUSED(g);
+
           return m_compare(m_properties[e], m_value);
         }
 

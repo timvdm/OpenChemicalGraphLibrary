@@ -39,7 +39,7 @@ namespace ocgl {
     EdgeCycle<Graph> edges;
     edges.reserve(vertices.size());
 
-    for (auto i = 1; i < vertices.size(); ++i) {
+    for (std::size_t i = 1; i < vertices.size(); ++i) {
       auto v1 = vertices[i - 1];
       auto v2 = vertices[i];
       edges.push_back(getEdge(g, v1, v2));
@@ -68,7 +68,7 @@ namespace ocgl {
     vertices.reserve(edges.size());
 
     vertices.push_back(edgePathSource(g, edges));
-    for (auto i = 1; i < edges.size(); ++i) {
+    for (std::size_t i = 1; i < edges.size(); ++i) {
       auto e1 = edges[i - 1];
       auto e2 = edges[i];
       vertices.push_back(commonVertex(g, e1, e2));
