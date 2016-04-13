@@ -87,6 +87,9 @@ namespace ocgl {
     unsigned int numConnectedComponents(const VertexEdgePropertyMap<Graph,
         unsigned int> &components)
     {
+      if (!numVertices(components.graph()))
+        return 0;
+
       unsigned int max = 0;
       for (auto v : getVertices(components.graph()))
         max = std::max(max, components.vertices[v]);
