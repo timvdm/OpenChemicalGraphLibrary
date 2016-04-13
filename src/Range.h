@@ -12,6 +12,7 @@
 namespace ocgl {
 
   /**
+   * @class Range Range.h <ocgl/Range.h>
    * @brief Iterator range.
    */
   template<typename Iterator>

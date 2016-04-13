@@ -91,7 +91,7 @@ namespace ocgl {
       void finishEdge(const Graph &g, Edge e) {}
 
       /**
-       * @brief Invoked when all edges are finished.
+       * @brief Invoked when all incident edges are finished.
        *
        * @param g The graph.
        * @param v The vertex
