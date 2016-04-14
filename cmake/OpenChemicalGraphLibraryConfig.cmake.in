@@ -1,0 +1,11 @@
+# OpenChemicalGraphLibrary CMake configuration file
+
+# If this file was found, then OpenChemicalGraphLibrary has been found
+set(OpenChemicalGraphLibrary_FOUND 1)
+
+set(OpenChemicalGraphLibrary_VERSION "@OpenChemicalGraphLibrary_VERSION@")
+
+set(OpenChemicalGraphLibrary_INSTALL_PREFIX  "@CMAKE_INSTALL_PREFIX@")
+set(OpenChemicalGraphLibrary_INCLUDE_DIRS    "${OpenChemicalGraphLibrary_INSTALL_PREFIX}/@CMAKE_INSTALL_INCLUDEDIR@")
+set(OpenChemicalGraphLibrary_LIBRARY_DIR     "${OpenChemicalGraphLibrary_INSTALL_PREFIX}/@CMAKE_INSTALL_LIBDIR@@LIB_SUFFIX@")
+set(OpenChemicalGraphLibrary_CMAKE_DIR       "${OpenChemicalGraphLibrary_LIBRARY_DIR}/cmake/OpenChemicalGraphLibrary")

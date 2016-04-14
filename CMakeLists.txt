@@ -1,8 +1,11 @@
-project(OpenChemicalGraphLibrary)
 cmake_minimum_required(VERSION 3.0)
+project(OpenChemicalGraphLibrary)
+
+set(OpenChemicalGraphLibrary_VERSION 0.1.0)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # utility functions (e.g. copy_headers, add_gtest)
-include(Functions.cmake)
+include(Functions)
 
 ############################################################
 #
@@ -26,7 +29,6 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "-pedantic -Wextra ${IGNORE_WARNINGS_FLAGS}")
 
 find_package(Threads)
-
 
 ############################################################
 #
@@ -87,3 +89,27 @@ option(BUILD_EXAMPLES "Build examples" ON)
 if(${BUILD_EXAMPLES})
   add_subdirectory(examples)
 endif()
+
+############################################################
+#
+# CMake configuratio file
+#
+############################################################
+
+configure_file(
+  "${CMAKE_SOURCE_DIR}/cmake/OpenChemicalGraphLibraryConfig.cmake.in"
+  "${CMAKE_BINARY_DIR}/OpenChemicalGraphLibraryConfig.cmake"
+  @ONLY
+)
+
+configure_file(
+  "${CMAKE_SOURCE_DIR}/cmake/OpenChemicalGraphLibraryConfigVersion.cmake.in"
+  "${CMAKE_BINARY_DIR}/OpenChemicalGraphLibraryConfigVersion.cmake"
+  @ONLY
+)
+
+install(FILES
+  "${CMAKE_BINARY_DIR}/OpenChemicalGraphLibraryConfig.cmake"
+  "${CMAKE_BINARY_DIR}/OpenChemicalGraphLibraryConfigVersion.cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenChemicalGraphLibrary"
+)
