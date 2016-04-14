@@ -158,6 +158,16 @@ namespace ocgl {
         return m_props[getEdgeIndex(*m_graph, e)];
       }
 
+      const std::vector<T>& map() const
+      {
+        return m_props;
+      }
+
+      std::vector<T>& map()
+      {
+        return m_props;
+      }
+
     private:
       template<typename Tag = VertexOrEdgeTag>
       typename std::enable_if<std::is_same<Tag, impl::VertexTag>::value>::type

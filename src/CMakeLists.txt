@@ -37,6 +37,7 @@ set(OCGL_ALGORITHM_HDRS
   algorithm/Backtrack.h
   algorithm/VF2State.h
   algorithm/Isomorphisms.h
+  algorithm/ExtendedConnectivities.h
 )
 
 copy_headers("${OCGL_HDRS}" ocgl)
