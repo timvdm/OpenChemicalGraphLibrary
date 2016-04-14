@@ -1,11 +1,15 @@
 cmake_minimum_required(VERSION 3.0)
 project(OpenChemicalGraphLibrary)
 
+# version
 set(OpenChemicalGraphLibrary_VERSION 0.1.0)
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # utility functions (e.g. copy_headers, add_gtest)
 include(Functions)
+
+# headers will be copied here
+include_directories(${CMAKE_BINARY_DIR}/include)
 
 ############################################################
 #
@@ -13,22 +17,21 @@ include(Functions)
 #
 ############################################################
 
-# headers will be copied here
-include_directories(${CMAKE_BINARY_DIR}/include)
-
-set(IGNORE_WARNINGS
-  sign-compare
-#  "gnu-zero-variadic-macro-arguments"
-)
-
-foreach(WARNING_NAME ${IGNORE_WARNINGS})
-  set(IGNORE_WARNINGS_FLAGS "${IRGNORE_WARNINGS_FLAGS} -Wno-${WARNING_NAME}")
-endforeach()
-
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "-pedantic -Wextra ${IGNORE_WARNINGS_FLAGS}")
 
-find_package(Threads)
+if(CMAKE_COMPILER_IS_GNUCXX)
+  set(IGNORE_WARNINGS
+    sign-compare
+  )
+
+  foreach(WARNING_NAME ${IGNORE_WARNINGS})
+    set(IGNORE_WARNINGS_FLAGS "${IRGNORE_WARNINGS_FLAGS} -Wno-${WARNING_NAME}")
+  endforeach()
+
+  set(CMAKE_CXX_FLAGS "-pedantic -Wextra ${IGNORE_WARNINGS_FLAGS}")
+
+  find_package(Threads)
+endif()
 
 ############################################################
 #
