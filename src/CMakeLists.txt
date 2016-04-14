@@ -28,6 +28,9 @@ set(OCGL_HDRS
   algorithm/Dijkstra.h
   algorithm/CycleMembership.h
   algorithm/RelevantCycles.h
+  algorithm/Backtrack.h
+  algorithm/VF2State.h
+  algorithm/Isomorphisms.h
 )
 
 copy_headers("${OCGL_HDRS}" ocgl)
