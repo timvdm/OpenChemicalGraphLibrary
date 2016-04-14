@@ -19,6 +19,8 @@ include_directories(${CMAKE_BINARY_DIR}/include)
 
 set(CMAKE_CXX_STANDARD 11)
 
+find_package(Threads)
+
 if(CMAKE_COMPILER_IS_GNUCXX)
   set(IGNORE_WARNINGS
     sign-compare
@@ -29,8 +31,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endforeach()
 
   set(CMAKE_CXX_FLAGS "-pedantic -Wextra ${IGNORE_WARNINGS_FLAGS}")
-
-  find_package(Threads)
 endif()
 
 ############################################################
